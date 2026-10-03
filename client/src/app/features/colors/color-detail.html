@@ -70,15 +70,10 @@
         }
 
         <div class="actions">
-          <button
-            mat-flat-button
-            type="button"
-            disabled
-            matTooltip="Room upload is coming in the next update"
-          >
+          <a mat-flat-button routerLink="/projects/new" [queryParams]="{ colorId: c._id }">
             <mat-icon>add_photo_alternate</mat-icon>
             Try on my room
-          </button>
+          </a>
           <button
             mat-stroked-button
             type="button"

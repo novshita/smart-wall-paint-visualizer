@@ -4,6 +4,7 @@
  */
 const auth = require('./paths/auth');
 const catalog = require('./paths/catalog');
+const projects = require('./paths/projects');
 
 module.exports = {
   openapi: '3.0.3',
@@ -21,6 +22,7 @@ module.exports = {
     schemas: {
       ...auth.schemas,
       ...catalog.schemas,
+      ...projects.schemas,
       Error: {
         type: 'object',
         properties: {
@@ -40,6 +42,7 @@ module.exports = {
   paths: {
     ...auth.paths,
     ...catalog.paths,
+    ...projects.paths,
     '/health': {
       get: {
         tags: ['System'],

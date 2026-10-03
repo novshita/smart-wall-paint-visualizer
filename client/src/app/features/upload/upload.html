@@ -1,0 +1,141 @@
+<section class="page">
+  <h1>Upload your room</h1>
+  <p class="muted lead">
+    Start with a clear photo of the room you want to paint. You'll mark the walls in the next step.
+  </p>
+
+  @if (color(); as c) {
+    <p class="trying" role="status">
+      <span class="dot" [style.background]="c.hex" aria-hidden="true"></span>
+      You'll try <strong>{{ c.name }}</strong
+      >&nbsp;({{ c.code }}) on this photo.
+    </p>
+  }
+
+  <div class="layout">
+    <div class="main">
+      @if (selected(); as s) {
+        <figure class="preview">
+          <img [src]="s.previewUrl" [alt]="'Preview of ' + (title || s.file.name)" />
+          <figcaption class="muted">
+            {{ s.file.name }} · {{ s.width }} × {{ s.height }} · {{ formatBytes(s.file.size) }}
+          </figcaption>
+        </figure>
+
+        <form class="details" (ngSubmit)="upload()">
+          <mat-form-field appearance="outline">
+            <mat-label>Project name</mat-label>
+            <input
+              matInput
+              name="title"
+              [(ngModel)]="title"
+              maxlength="150"
+              placeholder="e.g. Living room"
+            />
+          </mat-form-field>
+
+          <div class="ownership">
+            <mat-checkbox
+              name="ownership"
+              [(ngModel)]="ownershipConfirmed"
+              [disabled]="progress() !== null"
+            >
+              I took this photo or have permission to use it, and it doesn't show anyone's private
+              information without consent.
+            </mat-checkbox>
+          </div>
+
+          @if (error(); as message) {
+            <p class="form-error" role="alert">
+              <mat-icon aria-hidden="true">error</mat-icon>
+              {{ message }}
+            </p>
+          }
+
+          @if (progress() !== null) {
+            <div class="progress" aria-live="polite">
+              <mat-progress-bar
+                [mode]="processing() ? 'indeterminate' : 'determinate'"
+                [value]="progress()"
+                [attr.aria-label]="'Upload progress'"
+              />
+              <span class="muted">
+                {{ processing() ? 'Preparing your photo…' : 'Uploading… ' + progress() + '%' }}
+              </span>
+            </div>
+          }
+
+          <div class="actions">
+            @if (progress() === null) {
+              <button mat-flat-button type="submit" [disabled]="!ownershipConfirmed">
+                <mat-icon>cloud_upload</mat-icon>
+                Upload and continue
+              </button>
+              <button mat-button type="button" (click)="clear()">Choose a different photo</button>
+            } @else {
+              <button mat-stroked-button type="button" (click)="cancelUpload()">
+                Cancel upload
+              </button>
+            }
+          </div>
+        </form>
+      } @else {
+        <div
+          class="dropzone"
+          [class.dragging]="dragging()"
+          (dragover)="onDragOver($event)"
+          (dragleave)="dragging.set(false)"
+          (drop)="onDrop($event)"
+        >
+          <mat-icon class="big" aria-hidden="true">add_photo_alternate</mat-icon>
+          <p class="drop-title">Drag a photo here</p>
+          <p class="muted">or</p>
+          <button mat-flat-button type="button" (click)="fileInput.click()" [disabled]="checking()">
+            {{ checking() ? 'Checking photo…' : 'Choose a photo' }}
+          </button>
+          <p class="muted small">JPG or PNG, up to {{ maxMb() }} MB</p>
+          <input
+            #fileInput
+            class="visually-hidden"
+            type="file"
+            accept="image/jpeg,image/png"
+            aria-label="Choose a room photo"
+            (change)="onFileInput($event)"
+          />
+        </div>
+
+        @if (error(); as message) {
+          <p class="form-error" role="alert">
+            <mat-icon aria-hidden="true">error</mat-icon>
+            {{ message }}
+          </p>
+        }
+      }
+    </div>
+
+    <aside class="tips" aria-labelledby="tips-heading">
+      <h2 id="tips-heading">Tips for a great preview</h2>
+      <ul>
+        <li>
+          <mat-icon aria-hidden="true">wb_sunny</mat-icon> Shoot in even daylight, without harsh
+          shadows or flash.
+        </li>
+        <li>
+          <mat-icon aria-hidden="true">crop_free</mat-icon> Stand back so whole walls are in the
+          frame.
+        </li>
+        <li>
+          <mat-icon aria-hidden="true">straighten</mat-icon> Hold the camera level and straight on.
+        </li>
+        <li>
+          <mat-icon aria-hidden="true">lock</mat-icon> Your photos are private. Only you can see
+          them.
+        </li>
+      </ul>
+      <p class="muted small">
+        Location and camera data are removed from your photo when it's saved.
+      </p>
+      <app-disclaimer [compact]="true" />
+    </aside>
+  </div>
+</section>

@@ -26,6 +26,13 @@ const env = {
     .map((url) => url.trim())
     .filter(Boolean),
   maxUploadMb: Number(process.env.MAX_UPLOAD_MB) || 10,
+  storage: {
+    // Local disk storage root (development). S3 is configured via aws.* at deployment.
+    uploadDir: path.resolve(process.env.UPLOAD_DIR || path.join(__dirname, '../../uploads')),
+    // Secret for signing private file URLs; falls back to a value derived from JWT_SECRET
+    urlSecret: process.env.FILE_URL_SECRET || `${process.env.JWT_SECRET || 'test-secret'}:files`,
+    urlTtlSeconds: Number(process.env.FILE_URL_TTL_SECONDS) || 60 * 60,
+  },
   admin: {
     email: process.env.ADMIN_EMAIL,
     password: process.env.ADMIN_PASSWORD,

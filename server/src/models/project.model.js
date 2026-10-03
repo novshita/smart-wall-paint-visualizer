@@ -2,6 +2,17 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
+const imageSchema = new Schema(
+  {
+    storageKey: { type: String, required: true },
+    width: { type: Number, required: true },
+    height: { type: Number, required: true },
+    mimeType: String,
+    sizeBytes: Number,
+  },
+  { _id: false },
+);
+
 const selectionSchema = new Schema(
   {
     type: { type: String, enum: ['polygon', 'mask'], required: true },
@@ -56,15 +67,11 @@ const projectSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     title: { type: String, trim: true, maxlength: 150, default: 'Untitled design' },
-    originalImage: {
-      url: String,
-      storageKey: String,
-      width: Number,
-      height: Number,
-      mimeType: String,
-      sizeBytes: Number,
-    },
-    thumbnailUrl: String,
+    // Storage keys only; URLs are signed per request (see project.service toResponse)
+    originalImage: { type: imageSchema, required: true },
+    // Downscaled copy (max 2000px) used by the editor (FR-U5)
+    workingImage: { type: imageSchema, required: true },
+    thumbnail: { type: imageSchema, required: true },
     variants: { type: [variantSchema], default: [] },
     status: { type: String, enum: ['draft', 'saved'], default: 'draft' },
   },
