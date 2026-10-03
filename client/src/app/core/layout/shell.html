@@ -1,0 +1,69 @@
+<a class="skip-link" href="#main">Skip to content</a>
+
+<mat-toolbar class="header">
+  <a
+    [routerLink]="auth.isLoggedIn() ? '/dashboard' : '/'"
+    class="brand"
+    aria-label="Smart Wall Paint Visualizer home"
+  >
+    <mat-icon aria-hidden="true">format_paint</mat-icon>
+    <span>Wall<strong>Visualizer</strong></span>
+  </a>
+
+  <nav class="nav" aria-label="Main">
+    @if (auth.isLoggedIn()) {
+      <a mat-button routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+    }
+    <a mat-button routerLink="/colors" routerLinkActive="active">Colours</a>
+    <a mat-button routerLink="/help" routerLinkActive="active">How to use</a>
+  </nav>
+
+  <span class="spacer"></span>
+
+  @if (auth.user(); as user) {
+    <button
+      mat-button
+      class="user-button"
+      [matMenuTriggerFor]="userMenu"
+      [attr.aria-label]="'Account menu for ' + user.name"
+    >
+      <span class="avatar" aria-hidden="true">{{ initials(user.name) }}</span>
+      <span class="user-name">{{ user.name }}</span>
+      <mat-icon iconPositionEnd aria-hidden="true">expand_more</mat-icon>
+    </button>
+    <mat-menu #userMenu="matMenu" xPosition="before">
+      <div class="menu-header" aria-hidden="true">
+        <strong>{{ user.name }}</strong>
+        <span class="muted">{{ user.email }}</span>
+      </div>
+      <mat-divider />
+      <a mat-menu-item routerLink="/dashboard">
+        <mat-icon>dashboard</mat-icon>
+        <span>Dashboard</span>
+      </a>
+      <a mat-menu-item routerLink="/profile">
+        <mat-icon>person</mat-icon>
+        <span>Profile</span>
+      </a>
+      <mat-divider />
+      <button mat-menu-item (click)="auth.logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Log out</span>
+      </button>
+    </mat-menu>
+  } @else {
+    <a mat-button routerLink="/auth/login">Log in</a>
+    <a mat-flat-button routerLink="/auth/register">Sign up</a>
+  }
+</mat-toolbar>
+
+<main id="main" tabindex="-1">
+  <router-outlet />
+</main>
+
+<footer class="footer">
+  <span>&copy; {{ year }} Smart Wall Paint Visualizer</span>
+  <span class="muted"
+    >Previews are a visual guide; real colours vary with lighting and screens.</span
+  >
+</footer>

@@ -1,0 +1,13 @@
+# Local development database. Start with: docker compose up -d
+services:
+  mongo:
+    image: mongo:7
+    container_name: swpv-mongo
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - swpv-mongo-data:/data/db
+
+volumes:
+  swpv-mongo-data:

@@ -1,0 +1,122 @@
+<section class="page profile">
+  <h1>Your profile</h1>
+
+  @if (auth.user(); as user) {
+    <p class="muted meta">
+      Member since {{ user.createdAt | date: 'longDate' }}
+      @if (user.role === 'admin') {
+        · <strong>Administrator</strong>
+      }
+    </p>
+  }
+
+  <div class="grid">
+    <article class="card" aria-labelledby="details-heading">
+      <h2 id="details-heading">Account details</h2>
+
+      @if (detailsError(); as message) {
+        <p class="form-error" role="alert">{{ message }}</p>
+      }
+
+      <form [formGroup]="detailsForm" (ngSubmit)="saveDetails()" novalidate>
+        <mat-form-field appearance="outline">
+          <mat-label>Full name</mat-label>
+          <input matInput formControlName="name" autocomplete="name" required />
+          @if (detailsForm.controls.name.hasError('required')) {
+            <mat-error>Enter your name</mat-error>
+          } @else if (detailsForm.controls.name.hasError('minlength')) {
+            <mat-error>Name must be at least 2 characters</mat-error>
+          } @else if (detailsForm.controls.name.hasError('server')) {
+            <mat-error>{{ detailsForm.controls.name.getError('server') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" autocomplete="email" required />
+          @if (detailsForm.controls.email.hasError('required')) {
+            <mat-error>Enter your email</mat-error>
+          } @else if (detailsForm.controls.email.hasError('email')) {
+            <mat-error>Enter a valid email address</mat-error>
+          } @else if (detailsForm.controls.email.hasError('server')) {
+            <mat-error>{{ detailsForm.controls.email.getError('server') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <button mat-flat-button type="submit" [disabled]="savingDetails() || detailsForm.pristine">
+          {{ savingDetails() ? 'Saving…' : 'Save changes' }}
+        </button>
+      </form>
+    </article>
+
+    <article class="card" aria-labelledby="password-heading">
+      <h2 id="password-heading">Change password</h2>
+
+      @if (passwordError(); as message) {
+        <p class="form-error" role="alert">{{ message }}</p>
+      }
+
+      <form
+        [formGroup]="passwordForm"
+        (ngSubmit)="changePassword(passwordFormDirective)"
+        #passwordFormDirective="ngForm"
+        novalidate
+      >
+        <mat-form-field appearance="outline">
+          <mat-label>Current password</mat-label>
+          <input
+            matInput
+            type="password"
+            formControlName="currentPassword"
+            autocomplete="current-password"
+            required
+          />
+          @if (passwordForm.controls.currentPassword.hasError('required')) {
+            <mat-error>Enter your current password</mat-error>
+          } @else if (passwordForm.controls.currentPassword.hasError('server')) {
+            <mat-error>{{ passwordForm.controls.currentPassword.getError('server') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>New password</mat-label>
+          <input
+            matInput
+            type="password"
+            formControlName="newPassword"
+            autocomplete="new-password"
+            required
+          />
+          <mat-hint>At least 8 characters, with a letter and a number</mat-hint>
+          @if (passwordForm.controls.newPassword.hasError('required')) {
+            <mat-error>Choose a new password</mat-error>
+          } @else if (passwordForm.controls.newPassword.hasError('pattern')) {
+            <mat-error>Use at least 8 characters, with a letter and a number</mat-error>
+          } @else if (passwordForm.controls.newPassword.hasError('server')) {
+            <mat-error>{{ passwordForm.controls.newPassword.getError('server') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Confirm new password</mat-label>
+          <input
+            matInput
+            type="password"
+            formControlName="confirmPassword"
+            autocomplete="new-password"
+            required
+          />
+          @if (passwordForm.controls.confirmPassword.hasError('required')) {
+            <mat-error>Re-enter the new password</mat-error>
+          } @else if (passwordForm.controls.confirmPassword.hasError('mismatch')) {
+            <mat-error>Passwords don't match</mat-error>
+          }
+        </mat-form-field>
+
+        <button mat-flat-button type="submit" [disabled]="savingPassword()">
+          {{ savingPassword() ? 'Updating…' : 'Update password' }}
+        </button>
+      </form>
+    </article>
+  </div>
+</section>

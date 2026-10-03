@@ -1,0 +1,32 @@
+<section class="hero">
+  <div class="hero-text">
+    <h1>See the colour on <em>your</em> walls before you paint.</h1>
+    <p class="lead">
+      Upload a photo of your room, mark the walls, and preview paint colours, two-tone looks, and
+      patterns, with the room's real light and shadow kept intact.
+    </p>
+    <div class="cta">
+      <a mat-flat-button routerLink="/auth/register">Get started, it's free</a>
+      <a mat-stroked-button routerLink="/colors">Browse colours</a>
+    </div>
+  </div>
+  <div class="hero-art" aria-hidden="true">
+    @for (hex of heroSwatches; track hex) {
+      <span class="swatch" [style.background]="hex"></span>
+    }
+  </div>
+</section>
+
+<section class="page steps" aria-labelledby="how-heading">
+  <h2 id="how-heading">How it works</h2>
+  <ol>
+    @for (step of steps; track step.title; let i = $index) {
+      <li>
+        <mat-icon aria-hidden="true">{{ step.icon }}</mat-icon>
+        <h3>{{ i + 1 }}. {{ step.title }}</h3>
+        <p class="muted">{{ step.text }}</p>
+      </li>
+    }
+  </ol>
+  <app-disclaimer />
+</section>

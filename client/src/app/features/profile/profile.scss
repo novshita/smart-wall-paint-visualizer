@@ -1,0 +1,49 @@
+@use 'tokens' as *;
+
+.meta {
+  margin-bottom: var(--swpv-space-5);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--swpv-space-5);
+  align-items: start;
+}
+
+.card {
+  padding: var(--swpv-space-5);
+  background: #fff;
+  border: 1px solid var(--swpv-border);
+  border-radius: var(--swpv-radius);
+
+  h2 {
+    font-size: 1.15rem;
+    margin-bottom: var(--swpv-space-4);
+  }
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+
+  button {
+    align-self: flex-start;
+    min-height: var(--swpv-touch-target);
+    margin-top: var(--swpv-space-2);
+  }
+}
+
+.form-error {
+  margin: 0 0 var(--swpv-space-4);
+  padding: var(--swpv-space-3);
+  border-radius: var(--swpv-radius-sm);
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+@include tablet-down {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

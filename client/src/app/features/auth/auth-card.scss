@@ -1,0 +1,69 @@
+// Shared by the login and register pages
+.auth-page {
+  display: flex;
+  justify-content: center;
+  padding: var(--swpv-space-7) var(--swpv-space-4);
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+  padding: var(--swpv-space-6);
+  background: #fff;
+  border: 1px solid var(--swpv-border);
+  border-radius: var(--swpv-radius-lg);
+  box-shadow: var(--swpv-shadow);
+}
+
+h1 {
+  font-size: 1.6rem;
+}
+
+.subtitle {
+  margin: 0 0 var(--swpv-space-5);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.form-error,
+.notice {
+  display: flex;
+  gap: var(--swpv-space-2);
+  align-items: center;
+  margin: 0 0 var(--swpv-space-4);
+  padding: var(--swpv-space-3);
+  border-radius: var(--swpv-radius-sm);
+}
+
+.form-error {
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+.notice {
+  background: var(--swpv-warn-bg);
+  color: var(--swpv-warn-ink);
+}
+
+.submit {
+  min-height: var(--swpv-touch-target);
+  margin-top: var(--swpv-space-2);
+}
+
+.submit mat-spinner {
+  display: inline-block;
+  margin-right: var(--swpv-space-2);
+  vertical-align: middle;
+}
+
+.switch {
+  margin: var(--swpv-space-5) 0 0;
+  text-align: center;
+}

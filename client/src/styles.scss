@@ -1,0 +1,70 @@
+@use '@angular/material' as mat;
+@use 'tokens';
+
+html {
+  height: 100%;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$cyan-palette,
+        tertiary: mat.$orange-palette,
+      ),
+      typography: (
+        plain-family: 'Inter, Roboto, sans-serif',
+        brand-family: 'Inter, Roboto, sans-serif',
+      ),
+      density: 0,
+    )
+  );
+}
+
+body {
+  color-scheme: light;
+  background-color: var(--swpv-surface);
+  color: var(--swpv-ink);
+  font: var(--mat-sys-body-medium);
+  margin: 0;
+  height: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+a {
+  color: var(--swpv-brand);
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.2;
+  margin: 0 0 var(--swpv-space-3);
+}
+
+.page {
+  max-width: var(--swpv-content-max);
+  margin: 0 auto;
+  padding: var(--swpv-space-6) var(--swpv-space-5);
+}
+
+.muted {
+  color: var(--swpv-muted);
+}
+
+// Visible keyboard focus (WCAG 2.1 AA)
+:focus-visible {
+  outline: 3px solid var(--swpv-accent);
+  outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

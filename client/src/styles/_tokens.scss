@@ -1,0 +1,51 @@
+// Design tokens. Use these (or Material's --mat-sys-* variables) instead of hard-coded values.
+:root {
+  // Brand
+  --swpv-brand: #1f6f78;
+  --swpv-brand-dark: #154e55;
+  --swpv-accent: #e07a4f;
+  --swpv-ink: #1d2427;
+  --swpv-muted: #5b666b;
+  --swpv-surface: #fbfaf7;
+  --swpv-surface-alt: #f1eee8;
+  --swpv-border: #e1ddd5;
+  --swpv-warn-bg: #fff6e5;
+  --swpv-warn-ink: #7a4b00;
+
+  // Spacing (4px scale)
+  --swpv-space-1: 4px;
+  --swpv-space-2: 8px;
+  --swpv-space-3: 12px;
+  --swpv-space-4: 16px;
+  --swpv-space-5: 24px;
+  --swpv-space-6: 32px;
+  --swpv-space-7: 48px;
+  --swpv-space-8: 64px;
+
+  // Shape & elevation
+  --swpv-radius-sm: 6px;
+  --swpv-radius: 12px;
+  --swpv-radius-lg: 20px;
+  --swpv-shadow: 0 2px 12px rgb(0 0 0 / 8%);
+
+  // Layout
+  --swpv-content-max: 1200px;
+  --swpv-header-height: 64px;
+  --swpv-touch-target: 44px;
+}
+
+// Responsive breakpoints (desktop + tablet per spec §7)
+$bp-tablet: 768px;
+$bp-desktop: 1024px;
+
+@mixin tablet-down {
+  @media (max-width: #{$bp-desktop - 1px}) {
+    @content;
+  }
+}
+
+@mixin phone-down {
+  @media (max-width: #{$bp-tablet - 1px}) {
+    @content;
+  }
+}

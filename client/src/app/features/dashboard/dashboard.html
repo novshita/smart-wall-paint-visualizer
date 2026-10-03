@@ -1,0 +1,36 @@
+<section class="page">
+  <header class="welcome">
+    <h1>Hi {{ firstName() }} 👋</h1>
+    <p class="muted">Ready to try a new look for your room?</p>
+  </header>
+
+  <div class="quick">
+    <article class="card start">
+      <mat-icon aria-hidden="true">add_photo_alternate</mat-icon>
+      <div>
+        <h2>Start a new design</h2>
+        <p class="muted">Upload a photo of your room and start painting.</p>
+      </div>
+      <button mat-flat-button disabled>Coming soon</button>
+    </article>
+
+    <article class="card">
+      <mat-icon aria-hidden="true">palette</mat-icon>
+      <div>
+        <h2>Explore colours</h2>
+        <p class="muted">Browse shades by family and save your favourites.</p>
+      </div>
+      <a mat-stroked-button routerLink="/colors">Browse colours</a>
+    </article>
+  </div>
+
+  <section class="section" aria-labelledby="recent-heading">
+    <h2 id="recent-heading">Recent designs</h2>
+    <div class="empty">
+      <mat-icon aria-hidden="true">photo_library</mat-icon>
+      <p>No designs yet. Your saved designs will appear here.</p>
+    </div>
+  </section>
+
+  <app-disclaimer [compact]="true" />
+</section>
