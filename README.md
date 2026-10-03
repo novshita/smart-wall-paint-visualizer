@@ -278,6 +278,7 @@ Please follow the existing code style (ESLint and Prettier) and keep changes foc
 
 ## 📄 Documentation
 
+- 📄 [Project report (PDF)](docs/Project-Report.pdf)
 - 📘 [Full specification](docs/spec.md)
 - ☁️ [Deployment guide](docs/deployment.md)
 - 🔌 API docs: available at `/api/docs` when the server is running

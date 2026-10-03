@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Smart Wall Paint Visualizer · Project Report</title>
+    <link rel="stylesheet" href="report.css" />
+  </head>
+  <body>
+    <!-- ================= COVER ================= -->
+    <section class="cover">
+      <p class="label">Internship Project Report · Unified Mentor</p>
+      <h1>Smart Wall Paint Visualizer</h1>
+      <p class="subtitle">
+        A MEAN-stack web application that lets people preview paint colours, two-tone walls and patterns on a
+        photo of their own room, with realistic light and shadow, before they buy paint.
+      </p>
+      <div class="swatches" aria-hidden="true">
+        <span style="background: #f4f1ea"></span><span style="background: #d8c7a8"></span>
+        <span style="background: #a9c6d8"></span><span style="background: #a7b49a"></span>
+        <span style="background: #3e8a8e"></span><span style="background: #c46a45"></span>
+        <span style="background: #5e3b5c"></span><span style="background: #22344a"></span>
+      </div>
+      <img class="hero" src="../screenshots/studio-compare-designs.jpg" alt="Studio comparing two design variants" />
+      <table class="meta">
+        <tr><th>Submitted by</th><td>Novshita</td></tr>
+        <tr><th>Programme</th><td>Unified Mentor internship</td></tr>
+        <tr><th>Technology</th><td>MongoDB · Express.js · Angular 22 · Node.js</td></tr>
+        <tr>
+          <th>Source code</th>
+          <td><a href="https://github.com/novshita/smart-wall-paint-visualizer">github.com/novshita/smart-wall-paint-visualizer</a></td>
+        </tr>
+        <tr><th>Date</th><td>October 2026</td></tr>
+      </table>
+    </section>
+
+    <!-- ================= CONTENTS ================= -->
+    <section class="chapter newpage toc">
+      <h1>Contents</h1>
+      <ol>
+        <li>Introduction and problem statement</li>
+        <li>Objectives and scope</li>
+        <li>Users, roles and user flow</li>
+        <li>System architecture</li>
+        <li>Technology stack</li>
+        <li>Database design</li>
+        <li>Application pages</li>
+        <li>Features in detail</li>
+        <li>Realistic rendering method</li>
+        <li>Security and privacy</li>
+        <li>API design and documentation</li>
+        <li>Admin panel and analytics</li>
+        <li>Testing and quality assurance</li>
+        <li>Deployment</li>
+        <li>Challenges and how they were solved</li>
+        <li>Results against the requirements</li>
+        <li>Future scope</li>
+        <li>Conclusion and learnings</li>
+        <li>Appendix: running the project</li>
+      </ol>
+
+      <h2>Project at a glance</h2>
+      <div class="stats">
+        <div class="stat"><b>11</b><span>connected pages, all backed by the API</span></div>
+        <div class="stat"><b>44</b><span>documented REST operations (Swagger)</span></div>
+        <div class="stat"><b>194</b><span>automated tests (API, app and end-to-end)</span></div>
+        <div class="stat"><b>~15 ms</b><span>to recolour a wall (target: under 300 ms)</span></div>
+      </div>
+    </section>
+
+    <!-- ================= 1 ================= -->
+    <section class="chapter newpage">
+      <h1>1. Introduction and problem statement</h1>
+      <p>
+        Choosing a wall colour is one of the most common home-improvement decisions, and one of the easiest to
+        get wrong. A small paint chip under shop lighting rarely looks the same as a whole wall in a real room,
+        with its own daylight, shadows and furniture. A wrong choice means buying more paint, repainting, and
+        disappointment.
+      </p>
+      <p>The project specification identifies four problems:</p>
+      <ul>
+        <li>Customers cannot accurately visualise the final painted look.</li>
+        <li>Shade cards do not reflect real room lighting.</li>
+        <li>Wrong choices cause dissatisfaction and repainting costs.</li>
+        <li>No easy, user-friendly preview tool exists for ordinary users.</li>
+      </ul>
+      <p>
+        <strong>Smart Wall Paint Visualizer</strong> solves this with a browser-based tool. A user uploads a
+        photo of their own room, marks the walls with simple tools, and tries colours, two-tone splits and
+        patterns. The paint is blended so that the photo's own lighting, shadows and wall texture show through,
+        which makes the preview look like paint rather than a flat coloured overlay. Designs can be saved,
+        compared side by side, and downloaded at full resolution.
+      </p>
+      <p>
+        The same tool supports interior designers and painters during consultations, and paint retailers
+        helping customers decide.
+      </p>
+
+      <h1 class="sub">2. Objectives and scope</h1>
+      <h2>Objectives</h2>
+      <table class="data">
+        <thead><tr><th>Primary objectives</th><th>Secondary objectives</th></tr></thead>
+        <tbody>
+          <tr><td>Preview paint colours on the user's actual room photo</td><td>Support designers and painters in consultations</td></tr>
+          <tr><td>Reduce incorrect paint selection and repainting expense</td><td>Assist retailers in customer decision-making</td></tr>
+          <tr><td>Increase confidence in interior decisions</td><td>Encourage digital adoption in home-improvement planning</td></tr>
+          <tr><td>Provide a realistic, interactive visualisation experience</td><td>Demonstrate a practical MEAN-stack implementation</td></tr>
+        </tbody>
+      </table>
+      <h2>Scope (Phase 1)</h2>
+      <table class="data">
+        <thead><tr><th>In scope (built)</th><th>Out of scope</th></tr></thead>
+        <tbody>
+          <tr><td>Room photo upload (JPG/PNG) with validation</td><td>Automatic AI wall detection</td></tr>
+          <tr><td>Manual wall selection: polygon, brush and eraser</td><td>AR/VR live camera preview</td></tr>
+          <tr><td>Solid, two-tone and pattern application</td><td>Native mobile application</td></tr>
+          <tr><td>Opacity, brightness and finish adjustment; before/after</td><td>Direct paint purchase and payment</td></tr>
+          <tr><td>Save, reopen, compare variants and download designs</td><td></td></tr>
+          <tr><td>User and admin roles, admin dashboard with analytics</td><td></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ================= 3 ================= -->
+    <section class="chapter">
+      <h1>3. Users, roles and user flow</h1>
+      <table class="data">
+        <thead><tr><th>Role</th><th>Who</th><th>What they can do</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Guest</strong></td><td>Any visitor</td><td>Landing page, colour library, colour details, How to use guide</td></tr>
+          <tr><td><strong>User</strong></td><td>Homeowners, designers, painters, retail staff</td><td>Upload photos; select walls; paint, compare and save designs; download images; favourite colours; manage profile</td></tr>
+          <tr><td><strong>Admin</strong></td><td>System manager</td><td>Everything a user can do, plus manage colours, patterns, users and settings, view all designs and activity, and see the KPI dashboard</td></tr>
+        </tbody>
+      </table>
+
+      <h2>User flow</h2>
+      <figure>
+        <svg viewBox="0 0 760 120" xmlns="http://www.w3.org/2000/svg" font-family="Inter, sans-serif" font-size="12">
+          <defs>
+            <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 Z" fill="#5b666b" />
+            </marker>
+          </defs>
+          <g>
+            <rect x="4" y="30" width="92" height="56" rx="10" fill="#eef6f7" stroke="#1f6f78" />
+            <text x="50" y="55" text-anchor="middle" font-weight="600">1. Sign up</text>
+            <text x="50" y="72" text-anchor="middle" fill="#5b666b">or log in</text>
+            <rect x="112" y="30" width="92" height="56" rx="10" fill="#eef6f7" stroke="#1f6f78" />
+            <text x="158" y="55" text-anchor="middle" font-weight="600">2. Upload</text>
+            <text x="158" y="72" text-anchor="middle" fill="#5b666b">room photo</text>
+            <rect x="220" y="30" width="92" height="56" rx="10" fill="#eef6f7" stroke="#1f6f78" />
+            <text x="266" y="55" text-anchor="middle" font-weight="600">3. Select</text>
+            <text x="266" y="72" text-anchor="middle" fill="#5b666b">walls</text>
+            <rect x="328" y="30" width="92" height="56" rx="10" fill="#eef6f7" stroke="#1f6f78" />
+            <text x="374" y="55" text-anchor="middle" font-weight="600">4. Paint</text>
+            <text x="374" y="72" text-anchor="middle" fill="#5b666b">colour/pattern</text>
+            <rect x="436" y="30" width="92" height="56" rx="10" fill="#eef6f7" stroke="#1f6f78" />
+            <text x="482" y="55" text-anchor="middle" font-weight="600">5. Adjust</text>
+            <text x="482" y="72" text-anchor="middle" fill="#5b666b">finish, opacity</text>
+            <rect x="544" y="30" width="92" height="56" rx="10" fill="#eef6f7" stroke="#1f6f78" />
+            <text x="590" y="55" text-anchor="middle" font-weight="600">6. Compare</text>
+            <text x="590" y="72" text-anchor="middle" fill="#5b666b">before/after</text>
+            <rect x="652" y="30" width="102" height="56" rx="10" fill="#1f6f78" />
+            <text x="703" y="55" text-anchor="middle" font-weight="600" fill="#fff">7. Save &amp;</text>
+            <text x="703" y="72" text-anchor="middle" fill="#fff">download</text>
+          </g>
+          <g stroke="#5b666b" stroke-width="1.5" marker-end="url(#arr)">
+            <line x1="96" y1="58" x2="110" y2="58" /><line x1="204" y1="58" x2="218" y2="58" />
+            <line x1="312" y1="58" x2="326" y2="58" /><line x1="420" y1="58" x2="434" y2="58" />
+            <line x1="528" y1="58" x2="542" y2="58" /><line x1="636" y1="58" x2="650" y2="58" />
+          </g>
+        </svg>
+        <figcaption>Figure 1. The seven-step user flow from the specification (§4), implemented end to end.</figcaption>
+      </figure>
+
+      <h1 class="sub">4. System architecture</h1>
+      <p>
+        The application follows a classic three-tier design: an Angular single-page app in the browser, a
+        stateless Express REST API, and MongoDB for data. Images are kept out of the database in object storage
+        and are only reachable through short-lived signed links.
+      </p>
+      <figure>
+        <svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" font-family="Inter, sans-serif" font-size="12">
+          <defs>
+            <marker id="a2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 Z" fill="#1d2427" />
+            </marker>
+          </defs>
+          <!-- browser -->
+          <rect x="10" y="40" width="220" height="200" rx="12" fill="#fff" stroke="#dcd8d0" />
+          <text x="120" y="64" text-anchor="middle" font-weight="700" font-size="13">Browser · Angular 22 SPA</text>
+          <rect x="26" y="78" width="188" height="30" rx="6" fill="#eef6f7" /><text x="120" y="98" text-anchor="middle">Pages &amp; Angular Material UI</text>
+          <rect x="26" y="114" width="188" height="30" rx="6" fill="#eef6f7" /><text x="120" y="134" text-anchor="middle">Editor store (signals, undo)</text>
+          <rect x="26" y="150" width="188" height="30" rx="6" fill="#eef6f7" /><text x="120" y="170" text-anchor="middle">Canvas paint engine</text>
+          <rect x="26" y="186" width="188" height="30" rx="6" fill="#eef6f7" /><text x="120" y="206" text-anchor="middle">Auth guard + JWT interceptor</text>
+          <!-- api -->
+          <rect x="290" y="40" width="200" height="200" rx="12" fill="#fff" stroke="#dcd8d0" />
+          <text x="390" y="64" text-anchor="middle" font-weight="700" font-size="13">Express 5 REST API</text>
+          <rect x="306" y="78" width="168" height="30" rx="6" fill="#fff6ee" /><text x="390" y="98" text-anchor="middle">Helmet · CORS · rate limits</text>
+          <rect x="306" y="114" width="168" height="30" rx="6" fill="#fff6ee" /><text x="390" y="134" text-anchor="middle">JWT auth · role checks</text>
+          <rect x="306" y="150" width="168" height="30" rx="6" fill="#fff6ee" /><text x="390" y="170" text-anchor="middle">Joi validation</text>
+          <rect x="306" y="186" width="168" height="30" rx="6" fill="#fff6ee" /><text x="390" y="206" text-anchor="middle">Services: images, analytics</text>
+          <!-- db -->
+          <rect x="560" y="40" width="190" height="88" rx="12" fill="#fff" stroke="#dcd8d0" />
+          <text x="655" y="72" text-anchor="middle" font-weight="700" font-size="13">MongoDB (Atlas)</text>
+          <text x="655" y="92" text-anchor="middle" fill="#5b666b">users · projects · colors</text>
+          <text x="655" y="108" text-anchor="middle" fill="#5b666b">patterns · activity · feedback</text>
+          <!-- storage -->
+          <rect x="560" y="152" width="190" height="88" rx="12" fill="#fff" stroke="#dcd8d0" />
+          <text x="655" y="184" text-anchor="middle" font-weight="700" font-size="13">Object storage (S3)</text>
+          <text x="655" y="204" text-anchor="middle" fill="#5b666b">photos · renders · tiles</text>
+          <text x="655" y="220" text-anchor="middle" fill="#5b666b">private, signed URLs</text>
+          <!-- arrows -->
+          <g stroke="#1d2427" stroke-width="1.5" marker-end="url(#a2)" fill="none">
+            <line x1="230" y1="120" x2="288" y2="120" />
+            <line x1="490" y1="90" x2="558" y2="84" />
+            <line x1="490" y1="190" x2="558" y2="196" />
+            <path d="M120 240 C 120 285, 600 285, 640 242" stroke-dasharray="5 4" />
+          </g>
+          <text x="259" y="112" text-anchor="middle" font-size="11">HTTPS</text>
+          <text x="259" y="136" text-anchor="middle" font-size="11">JSON</text>
+          <text x="380" y="282" text-anchor="middle" font-size="11" fill="#5b666b">Browser loads images directly with signed, expiring links</text>
+          <text x="380" y="22" text-anchor="middle" font-size="11" fill="#5b666b">Hosting: Vercel (app, proxies /api) → Render (API, Docker) → Atlas + S3</text>
+        </svg>
+        <figcaption>Figure 2. System architecture.</figcaption>
+      </figure>
+      <h2>Design decisions</h2>
+      <ul>
+        <li><strong>Rendering runs in the browser.</strong> Recolouring happens on an HTML5 canvas in the user's browser, so changes appear instantly and the server never has to process images per click.</li>
+        <li><strong>Walls are stored as vectors, not images.</strong> A wall is a polygon plus brush/eraser strokes in coordinates normalised to the photo (0–1). This keeps saved designs small, fully editable, and re-renderable at any resolution.</li>
+        <li><strong>Feature-based modular code.</strong> The Angular app is split into lazy-loaded feature areas (upload, wall selection, studio, admin, …) and the API into routes, controllers, services and middleware, as the specification's structure (§11) suggests.</li>
+      </ul>
+    </section>
+
+    <!-- ================= 5 ================= -->
+    <section class="chapter">
+      <h1>5. Technology stack</h1>
+      <table class="data">
+        <thead><tr><th>Layer</th><th>Technology</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>Frontend</td><td>Angular 22 (standalone components, signals), Angular Material, TypeScript, SCSS</td><td>Required MEAN stack; signals make the editor's state simple and fast; Material gives accessible, consistent components</td></tr>
+          <tr><td>Graphics</td><td>HTML5 Canvas, SVG</td><td>Pixel-level control for realistic blending; SVG for charts and diagrams</td></tr>
+          <tr><td>Backend</td><td>Node.js, Express 5, Joi, Mongoose 9</td><td>Lightweight REST API with validation on every endpoint</td></tr>
+          <tr><td>Database</td><td>MongoDB (Atlas in production)</td><td>Flexible documents fit nested designs (variants → walls → styles)</td></tr>
+          <tr><td>Images</td><td>sharp, AWS S3 (local disk in development)</td><td>Fast re-encoding, metadata stripping, resizing; private object storage</td></tr>
+          <tr><td>Security</td><td>bcrypt, JWT, Helmet, express-rate-limit</td><td>Spec §12 requirements</td></tr>
+          <tr><td>Testing</td><td>Mocha + Supertest + in-memory MongoDB, Vitest, Playwright, axe</td><td>API, app, end-to-end and accessibility coverage</td></tr>
+          <tr><td>DevOps</td><td>Docker, GitHub Actions, Render, Vercel</td><td>Repeatable builds and automatic checks on every change</td></tr>
+        </tbody>
+      </table>
+
+      <h1 class="sub">6. Database design</h1>
+      <p>Seven MongoDB collections. Images are stored in object storage; the database keeps only their storage keys and metadata.</p>
+      <figure>
+        <svg viewBox="0 0 760 250" xmlns="http://www.w3.org/2000/svg" font-family="Inter, sans-serif" font-size="11">
+          <g fill="#fff" stroke="#1f6f78">
+            <rect x="10" y="20" width="170" height="110" rx="8" /><rect x="260" y="20" width="250" height="210" rx="8" />
+            <rect x="570" y="20" width="180" height="100" rx="8" /><rect x="570" y="140" width="180" height="90" rx="8" />
+            <rect x="10" y="150" width="170" height="80" rx="8" />
+          </g>
+          <g font-weight="700" font-size="12">
+            <text x="22" y="40">users</text><text x="272" y="40">projects</text><text x="582" y="40">colors</text>
+            <text x="582" y="160">patterns</text><text x="22" y="170">activity_logs · feedback</text>
+          </g>
+          <g fill="#5b666b">
+            <text x="22" y="58">name, email (unique)</text><text x="22" y="74">passwordHash (bcrypt)</text>
+            <text x="22" y="90">role · isActive</text><text x="22" y="106">favoriteColors[ ] → colors</text>
+            <text x="22" y="122">favoritePatterns[ ] → patterns</text>
+            <text x="272" y="58">userId → users (indexed)</text><text x="272" y="74">title · status (draft/saved)</text>
+            <text x="272" y="90">originalImage · workingImage · thumbnail</text>
+            <text x="272" y="110" fill="#1d2427" font-weight="600">variants[ ]</text>
+            <text x="284" y="126">variantId · name · renderKey</text>
+            <text x="284" y="142" fill="#1d2427" font-weight="600">regions[ ] (walls)</text>
+            <text x="296" y="158">selection: polygon + strokes</text>
+            <text x="296" y="174">feather</text>
+            <text x="296" y="190">style: mode, colorId, secondary,</text>
+            <text x="296" y="206">split, pattern, opacity, finish…</text>
+            <text x="582" y="58">code (unique) · name · hex</text><text x="582" y="74">rgb · brand · family</text>
+            <text x="582" y="90">finishes · tags · isActive</text><text x="582" y="106">text index on name/code</text>
+            <text x="582" y="178">name · category · imageUrl</text><text x="582" y="194">tileSize · isActive</text>
+            <text x="22" y="188">userId · action · projectId</text><text x="22" y="204">metadata · sessionId</text>
+            <text x="22" y="220">rating (1–5) · comment</text>
+          </g>
+          <g stroke="#5b666b" stroke-dasharray="4 3" fill="none">
+            <line x1="180" y1="70" x2="260" y2="60" /><line x1="510" y1="190" x2="570" y2="70" />
+            <line x1="510" y1="205" x2="570" y2="185" /><line x1="180" y1="190" x2="260" y2="150" />
+          </g>
+        </svg>
+        <figcaption>Figure 3. Main collections and relationships (a settings collection holds admin configuration).</figcaption>
+      </figure>
+      <table class="data">
+        <thead><tr><th>Collection</th><th>Purpose</th><th>Key indexes</th></tr></thead>
+        <tbody>
+          <tr><td>users</td><td>Accounts, roles, favourites, last login</td><td>email (unique)</td></tr>
+          <tr><td>projects</td><td>Photos, design variants, walls and styles</td><td>userId + updatedAt</td></tr>
+          <tr><td>colors</td><td>Paint catalogue (48 seed colours in 10 families)</td><td>code (unique), text (name, code), family, brand</td></tr>
+          <tr><td>patterns</td><td>Pattern tiles (8 seed patterns)</td><td>category</td></tr>
+          <tr><td>activity_logs</td><td>Logins, uploads, saves, downloads, sessions (for KPIs)</td><td>createdAt, action + createdAt</td></tr>
+          <tr><td>feedback</td><td>1–5 satisfaction ratings</td><td>—</td></tr>
+          <tr><td>settings</td><td>Upload limit, formats, default finish, disclaimer</td><td>key (unique)</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ================= 7 ================= -->
+    <section class="chapter">
+      <h1>7. Application pages</h1>
+      <p>All eleven pages from the specification are built, connected through navigation, and backed by the API.</p>
+      <table class="data">
+        <thead><tr><th>#</th><th>Page</th><th>Route</th><th>Access</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Landing</td><td><code>/</code></td><td>Public</td><td>Introduction, featured colours, call to action</td></tr>
+          <tr><td>2</td><td>Login / Register</td><td><code>/auth/login</code>, <code>/auth/register</code></td><td>Public</td><td>Authentication with field-level validation</td></tr>
+          <tr><td>3</td><td>Dashboard</td><td><code>/dashboard</code></td><td>User</td><td>Quick start, recent designs, favourite colours</td></tr>
+          <tr><td>4</td><td>Image upload</td><td><code>/projects/new</code></td><td>User</td><td>Drag-and-drop upload with checks and progress</td></tr>
+          <tr><td>5</td><td>Wall selection</td><td><code>/projects/:id/select</code></td><td>User</td><td>Polygon, brush and eraser tools</td></tr>
+          <tr><td>6</td><td>Studio</td><td><code>/projects/:id/studio</code></td><td>User</td><td>Paint, adjust, compare, save, download</td></tr>
+          <tr><td>7</td><td>Colour library</td><td><code>/colors</code></td><td>Public</td><td>Browse, search, filter, favourite</td></tr>
+          <tr><td>8</td><td>Saved designs</td><td><code>/projects</code></td><td>User</td><td>Reopen, rename, duplicate, download, delete</td></tr>
+          <tr><td>9</td><td>Profile</td><td><code>/profile</code></td><td>User</td><td>Account details, password, favourites</td></tr>
+          <tr><td>10</td><td>How to use</td><td><code>/help</code></td><td>Public</td><td>Tutorial, shortcuts, FAQ, disclaimer</td></tr>
+          <tr><td>11</td><td>Admin panel</td><td><code>/admin/*</code></td><td>Admin</td><td>Dashboard, colours, patterns, users, designs, activity, settings</td></tr>
+        </tbody>
+      </table>
+      <figure>
+        <img src="images/landing.jpg" alt="Landing page" />
+        <figcaption>Figure 4. Landing page with featured colours from the live catalogue.</figcaption>
+      </figure>
+    </section>
+
+    <!-- ================= 8 ================= -->
+    <section class="chapter">
+      <h1>8. Features in detail</h1>
+
+      <h2>8.1 Uploading a room photo</h2>
+      <p>
+        Users drag in a photo or choose one. The browser checks the type, size and dimensions instantly and
+        shows a preview; the server then checks everything again. Users must confirm that they own the photo,
+        as the project guidelines require. On the server each upload is re-encoded, which removes hidden data
+        such as GPS location, and stored in three sizes: the original (for full-quality downloads), a working
+        copy of at most 2000 px (for fast editing), and a thumbnail.
+      </p>
+      <figure>
+        <img src="images/upload.jpg" alt="Upload page" />
+        <figcaption>Figure 5. Upload page: preview, project name, ownership confirmation and photo tips.</figcaption>
+      </figure>
+
+      <h2>8.2 Selecting walls</h2>
+      <ul>
+        <li><strong>Polygon tool:</strong> click each corner; close on the first point or press Enter; drag corners afterwards to adjust.</li>
+        <li><strong>Brush and eraser:</strong> paint to add awkward areas or remove windows, doors and furniture, with adjustable size.</li>
+        <li><strong>Multiple named walls</strong>, each painted independently; rename, delete with undo.</li>
+        <li><strong>Precision aids:</strong> zoom and pan (mouse wheel, pinch and two-finger pan on tablets), 100-step undo/redo, adjustable soft edges, keyboard shortcuts.</li>
+        <li>A <strong>first-use guide</strong> explains the steps the first time someone opens the editor.</li>
+      </ul>
+      <figure class="pair">
+        <img src="images/guide.jpg" alt="First-use guide" />
+        <img src="../screenshots/wall-selection.jpg" alt="Wall selection" />
+        <figcaption>Figure 6. Left: the first-use guide. Right: the back wall traced with the polygon tool, with the window, picture and sofa removed with the eraser.</figcaption>
+      </figure>
+    </section>
+
+    <section class="chapter">
+      <h2>8.3 Painting in the studio</h2>
+      <p>Each wall can be painted in one of three ways:</p>
+      <ul>
+        <li><strong>Solid colour</strong> from the library, favourites, recently used colours, or any custom HEX code.</li>
+        <li><strong>Two-tone:</strong> two colours split horizontally or vertically at an adjustable position, like a painted dado line.</li>
+        <li><strong>Pattern:</strong> a tile repeated across the wall, with adjustable size and rotation and chosen background and pattern colours.</li>
+      </ul>
+      <p>
+        Finish (matte, satin, glossy), opacity, brightness and edge softness are adjustable per wall. The applied
+        colour's name, code and brand are always shown, and a disclaimer reminds users that real results vary
+        with lighting, screen calibration and wall texture.
+      </p>
+      <figure>
+        <img src="../screenshots/studio-two-tone-pattern.jpg" alt="Studio with two-tone and pattern" />
+        <figcaption>Figure 7. A two-tone back wall and a chevron-patterned side wall. The photo's lighting remains visible.</figcaption>
+      </figure>
+
+      <h2>8.4 Design variants and comparison</h2>
+      <p>
+        Users can try several ideas on the same photo. A new variant copies the current colours; walls are shared
+        across variants, so editing a wall's shape updates every design. The compare slider shows the original
+        photo, or another design, on one side of a draggable divider.
+      </p>
+      <figure class="pair">
+        <img src="images/before-after.jpg" alt="Before and after slider" />
+        <img src="../screenshots/studio-compare-designs.jpg" alt="Comparing two designs" />
+        <figcaption>Figure 8. Left: before/after slider. Right: comparing “Design 1” with “Design 2”.</figcaption>
+      </figure>
+    </section>
+
+    <section class="chapter">
+      <h2>8.5 Saving, downloading and managing designs</h2>
+      <ul>
+        <li><strong>Auto-save</strong> about one second after the user stops editing, with a visible status (Saving…, All changes saved, Retry).</li>
+        <li><strong>Download</strong> as PNG or JPG at the photo's full original resolution, either the painted room or a side-by-side before/after, with an optional caption listing each wall's colours and the disclaimer.</li>
+        <li><strong>My designs</strong> shows painted thumbnails with Draft/Saved status; designs can be reopened, renamed, duplicated (including their photos), downloaded and deleted.</li>
+      </ul>
+      <figure class="pair">
+        <img src="images/export-painted.jpg" alt="Exported image with caption" />
+        <img src="images/export-before-after.jpg" alt="Exported before and after image" style="align-self: center" />
+        <figcaption>Figure 9. Real exports: painted room with colour caption (left) and a before/after image (right).</figcaption>
+      </figure>
+      <figure>
+        <img src="../screenshots/my-designs.jpg" alt="My designs page" />
+        <figcaption>Figure 10. My designs: painted thumbnails, status badges and actions.</figcaption>
+      </figure>
+
+      <h2>8.6 Colour library and favourites</h2>
+      <p>
+        The library groups colours by family and supports search by name, code or HEX, and filters by room and
+        finish. Filters are kept in the page address, so a search can be bookmarked or shared. Each colour has a
+        detail page with HEX/RGB values, finish previews, suitable rooms, related colours and a “Try on my room”
+        button that starts an upload with that colour pre-selected.
+      </p>
+      <figure class="pair">
+        <img src="../screenshots/colour-library.jpg" alt="Colour library" />
+        <img src="images/colour-detail.jpg" alt="Colour detail" />
+        <figcaption>Figure 11. Colour library and colour detail page.</figcaption>
+      </figure>
+    </section>
+
+    <!-- ================= 9 ================= -->
+    <section class="chapter">
+      <h1>9. Realistic rendering method</h1>
+      <p>
+        The quality of the product depends on making painted walls look real. Simply drawing a semi-transparent
+        colour over the photo looks flat and fake, because it hides the shading that tells the eye a wall is three
+        dimensional. The paint engine instead <strong>keeps each pixel's shading and replaces only its colour</strong>.
+      </p>
+      <h2>Algorithm</h2>
+      <ol>
+        <li><strong>Mask.</strong> The wall's polygon and brush/eraser strokes are drawn into an alpha mask at the image's resolution. Optional feathering blurs the edge (three passes of a box blur, approximating a Gaussian).</li>
+        <li><strong>Luminance.</strong> Every pixel's brightness is computed in <em>linear light</em> (not raw sRGB values), which is how light actually adds up.</li>
+        <li><strong>Relative shading.</strong> The engine finds the wall's average brightness, then each pixel's shading <em>s</em> relative to that average: shadows have <em>s</em> &lt; 1, highlights <em>s</em> &gt; 1.</li>
+        <li><strong>Finish.</strong> Highlights are flattened for matte (×0.55), kept for satin and boosted for glossy (×1.4).</li>
+        <li><strong>Recolour.</strong> The paint colour is multiplied by the shading and brightness, converted back to sRGB, and mixed with the photo by the mask and opacity.</li>
+      </ol>
+      <div class="formula">
+        s = L<sub>pixel</sub> / L<sub>wall average</sub><br />
+        result<sub>linear</sub> = paint<sub>linear</sub> × finish(s) × 2<sup>brightness / 100</sup><br />
+        output = mix(photo, toSRGB(result), mask × opacity)
+      </div>
+      <p>
+        A useful property: on a perfectly evenly lit wall the result is <em>exactly</em> the paint colour, while
+        real photos keep their shadows, light falloff and texture. Two-tone walls choose the colour per pixel by
+        the split line (with a 1-pixel anti-aliased edge); patterns mix the two colours by the tile's coverage.
+      </p>
+      <h2>Performance</h2>
+      <p>
+        Masks and luminance are cached, so changing a colour only re-runs the per-pixel blend, using lookup
+        tables for the sRGB conversions. On a 1600 × 1200 photo a colour change takes about <strong>11–21 ms</strong>
+        in Chrome, far inside the specification's target of 300 ms for a 2000 px image (§7). A unit test enforces
+        the 300 ms budget on a 2000 × 1500 image.
+      </p>
+      <h2>Full-resolution export</h2>
+      <p>
+        Downloads re-run the same engine on the full-size original photo instead of the 2000 px working copy, as
+        the specification requires (§8.6). Because walls are stored as vectors, they redraw sharply at any size.
+      </p>
+      <figure class="half">
+        <img src="images/test-room.jpg" alt="Original test room" />
+        <figcaption>Figure 12. Original test photo (synthetic room, no copyrighted images). Compare with Figure 7.</figcaption>
+      </figure>
+    </section>
+
+    <!-- ================= 10 ================= -->
+    <section class="chapter">
+      <h1>10. Security and privacy</h1>
+      <table class="data">
+        <thead><tr><th>Area</th><th>Measure</th></tr></thead>
+        <tbody>
+          <tr><td>Passwords</td><td>bcrypt with cost 12; never returned by the API; strength rules (8+ characters, letter and number)</td></tr>
+          <tr><td>Sessions</td><td>JWT with 1-hour expiry; a password change or deactivation ends all existing sessions immediately (token versioning)</td></tr>
+          <tr><td>Login</td><td>Identical error and timing for wrong password vs unknown email, so attackers can't discover accounts; rate limiting</td></tr>
+          <tr><td>Authorisation</td><td>Role checks on every admin endpoint and page; users can only reach their own designs (others get “not found”, so ids can't be probed); admins can't lock themselves out</td></tr>
+          <tr><td>Uploads</td><td>File type checked by content (magic bytes), not name; size limit set by admin; corrupt, tiny and oversized (50 MP+) images rejected; every image re-encoded to strip metadata and hidden payloads; SVG pattern uploads refused</td></tr>
+          <tr><td>Image privacy</td><td>Photos never served publicly; only short-lived signed links (HMAC locally, AWS Signature V4 presigned URLs on S3); deleting a design deletes its files</td></tr>
+          <tr><td>Input</td><td>Joi validation on every endpoint; NoSQL operator stripping; escaped search terms; size limits on request bodies</td></tr>
+          <tr><td>Transport &amp; headers</td><td>HTTPS redirect and HSTS in production; Helmet headers; Content-Security-Policy; CORS allow-list</td></tr>
+          <tr><td>Dependencies</td><td><code>npm audit</code> in CI: 0 known vulnerabilities at submission</td></tr>
+        </tbody>
+      </table>
+      <div class="callout">
+        <strong>Guidelines compliance.</strong> Users confirm photo ownership before uploading; the colour-accuracy
+        disclaimer appears on the landing page, the studio, the help page and in exported images; all design,
+        code and assets are original (colour names, pattern tiles and the test room photo were created for this
+        project).
+      </div>
+
+      <h1 class="sub">11. API design and documentation</h1>
+      <p>
+        The REST API lives under <code>/api/v1</code> and returns JSON, with one consistent error format
+        (<code>{ status, message, errors[] }</code>) that the app uses to show field-level messages. All
+        <strong>44 operations</strong> are documented with examples in an interactive <strong>Swagger UI</strong> at
+        <code>/api/docs</code>, where reviewers can log in and try every endpoint.
+      </p>
+      <table class="data">
+        <thead><tr><th>Group</th><th>Examples</th></tr></thead>
+        <tbody>
+          <tr><td>Auth</td><td>register, login, logout, get/update profile, change password</td></tr>
+          <tr><td>Projects</td><td>upload, list, get, save walls/styles, duplicate, upload render, delete</td></tr>
+          <tr><td>Catalogue</td><td>colours (list, search, facets, detail), patterns; admin create/update/remove and CSV/JSON import</td></tr>
+          <tr><td>Favourites</td><td>list, add and remove favourite colours and patterns</td></tr>
+          <tr><td>Admin</td><td>analytics, users, all designs, activity, settings</td></tr>
+          <tr><td>System</td><td>health check, public settings, activity events, feedback</td></tr>
+        </tbody>
+      </table>
+      <figure>
+        <img src="images/swagger.jpg" alt="Swagger UI" />
+        <figcaption>Figure 13. Interactive API documentation (Swagger UI).</figcaption>
+      </figure>
+    </section>
+
+    <!-- ================= 12 ================= -->
+    <section class="chapter">
+      <h1>12. Admin panel and analytics</h1>
+      <ul>
+        <li><strong>Colours:</strong> add, edit, remove and restore; bulk import from CSV or JSON with a per-row error report. Changes appear in the public library immediately.</li>
+        <li><strong>Patterns:</strong> upload tiles (converted to greyscale so users can tint them), edit and remove.</li>
+        <li><strong>Users:</strong> search, change roles, activate or deactivate.</li>
+        <li><strong>Designs and activity:</strong> read-only views of all users' designs and a filterable activity log.</li>
+        <li><strong>Settings:</strong> maximum upload size, allowed formats, default finish and the disclaimer text, applied immediately.</li>
+      </ul>
+      <h2>KPI dashboard</h2>
+      <p>
+        The dashboard shows the four KPIs from the specification (§14) for the last 7, 30 or 90 days and refreshes
+        every 30 seconds: <strong>room photos uploaded</strong>, <strong>designs saved</strong>, <strong>average
+        session duration</strong> (measured in the browser and sent even when the tab closes) and <strong>user
+        satisfaction</strong> (a 1–5 star rating requested after downloads, at most once a week). It also shows
+        daily trends with a table view, the rating distribution and the most-used colours. The chart colours were
+        checked with a colour-vision-deficiency validator.
+      </p>
+      <figure>
+        <img src="../screenshots/admin-dashboard.jpg" alt="Admin dashboard" />
+        <figcaption>Figure 14. Admin KPI dashboard.</figcaption>
+      </figure>
+      <figure>
+        <img src="images/admin-colours.jpg" alt="Admin colour management" />
+        <figcaption>Figure 15. Colour management with add, edit, remove and import.</figcaption>
+      </figure>
+    </section>
+
+    <!-- ================= 13 ================= -->
+    <section class="chapter newpage">
+      <h1>13. Testing and quality assurance</h1>
+      <div class="stats">
+        <div class="stat"><b>102</b><span>API tests (Mocha, Supertest, in-memory MongoDB)</span></div>
+        <div class="stat"><b>89</b><span>app tests (Vitest)</span></div>
+        <div class="stat"><b>3</b><span>end-to-end journeys (Playwright, real browser)</span></div>
+        <div class="stat"><b>22</b><span>pages and dialogs passing WCAG 2.1 AA checks (axe)</span></div>
+      </div>
+      <table class="data">
+        <thead><tr><th>Level</th><th>What is covered</th></tr></thead>
+        <tbody>
+          <tr><td>API</td><td>Authentication and sessions; upload validation (fake files, GPS stripping, orientation, size limits); access control; signed links (tampering, expiry, path traversal); designs; admin features; CSV import; analytics; AWS signing checked against AWS's published example</td></tr>
+          <tr><td>App</td><td>Auth service and guards; forms; colour library; upload flow; editor geometry, undo history, zoom maths; the paint blend (flat wall equals the target colour, shadows kept, opacity, finish, two-tone, patterns); render-time budget; editor store (auto-save, variant sync, undo grouping)</td></tr>
+          <tr><td>End-to-end</td><td>Register → upload → select with both tools → paint → compare → save → download → reopen → delete; admin KPIs and colour management; blocked access for guests and other users</td></tr>
+          <tr><td>Accessibility</td><td>Automated WCAG 2.1 AA audit of every page; keyboard navigation and shortcuts; visible focus; labels and alt text; screen-reader announcements</td></tr>
+          <tr><td>Visual</td><td>Scripted browser runs with screenshots at desktop (1440 px) and tablet (1024 px) sizes; exported files checked for resolution and content</td></tr>
+          <tr><td>Continuous integration</td><td>GitHub Actions on every change: lint → tests → security audit → build → end-to-end tests → deploy</td></tr>
+        </tbody>
+      </table>
+      <p>
+        Linting (ESLint) and formatting (Prettier) are enforced on both projects, and every feature was merged
+        through a pull request with all checks passing.
+      </p>
+
+      <h1 class="sub">14. Deployment</h1>
+      <table class="data">
+        <thead><tr><th>Layer</th><th>Service</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>Web app</td><td>Vercel</td><td>HTTPS, security headers; forwards <code>/api</code> to the API so the browser uses one domain</td></tr>
+          <tr><td>API</td><td>Render (Docker)</td><td>Non-root container, health check, HTTPS redirect</td></tr>
+          <tr><td>Database</td><td>MongoDB Atlas</td><td>Managed, backed up</td></tr>
+          <tr><td>Images</td><td>AWS S3</td><td>Private bucket; presigned links; public prefix only for pattern tiles</td></tr>
+          <tr><td>CI/CD</td><td>GitHub Actions</td><td>Deploys automatically after all tests pass on <code>main</code></td></tr>
+        </tbody>
+      </table>
+      <p>
+        Environment configuration is kept in environment variables, never in code. A step-by-step guide is in
+        <code>docs/deployment.md</code>. The live deployment link is provided with this submission.
+      </p>
+    </section>
+
+    <!-- ================= 15 ================= -->
+    <section class="chapter">
+      <h1>15. Challenges and how they were solved</h1>
+      <table class="data">
+        <thead><tr><th>Challenge</th><th>Solution</th></tr></thead>
+        <tbody>
+          <tr><td>Painted walls looked flat and fake with simple colour overlays</td><td>Designed a luminance-preserving blend in linear light that keeps each pixel's shading relative to the wall's average (Section 9)</td></tr>
+          <tr><td>Rendering speed on large photos</td><td>Edit on a 2000 px working copy; cache masks and luminance; lookup tables; coalesce redraws to one per frame; export separately at full resolution</td></tr>
+          <tr><td>Saving brush selections efficiently and keeping them editable</td><td>Stored walls as vector polygons and strokes in normalised coordinates instead of mask images</td></tr>
+          <tr><td>The test framework (Jest) could not connect to the test database on Node 26</td><td>Diagnosed a driver handshake problem inside Jest's sandbox and switched API tests to Mocha</td></tr>
+          <tr><td>Seeded colours were missing RGB values, crashing the colour detail page</td><td>Found through screenshot testing; fixed the seed script, backfilled existing data, and added tests for seed data</td></tr>
+          <tr><td>The first corner of a polygon was sometimes lost</td><td>Browser testing revealed a timing issue; tied unfinished polygons to their wall so behaviour no longer depends on timing</td></tr>
+          <tr><td>Pressing Enter to finish a polygon also clicked the last-used button</td><td>Made the canvas take keyboard focus when clicked</td></tr>
+          <tr><td>Signed image links changed on every request, so browsers re-downloaded images</td><td>Made links stable within each hour so they can be cached, while still expiring</td></tr>
+          <tr><td>Accessibility issues in the wall list and variants bar (nested buttons, incomplete tab roles)</td><td>Restructured both components; all pages now pass the automated WCAG 2.1 AA audit</td></tr>
+          <tr><td>End-to-end tests failed only in CI (“port already in use”)</td><td>Traced it to a shared PORT variable read by both servers; pinned each server's port explicitly</td></tr>
+        </tbody>
+      </table>
+
+      <h1 class="sub">16. Results against the requirements</h1>
+      <table class="data">
+        <thead><tr><th>Acceptance criterion (spec §20)</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td>New user can register, upload, select a wall with both tools, apply a colour, compare, save and download using only the in-app guide</td><td class="ok">Met (automated end-to-end test)</td></tr>
+          <tr><td>Painted walls retain visible shadows and texture</td><td class="ok">Met (Figures 7–9; unit tests)</td></tr>
+          <tr><td>Dual-tone and patterns on at least one region; multiple regions per image</td><td class="ok">Met</td></tr>
+          <tr><td>Saved projects reopen with selections and styles fully editable</td><td class="ok">Met</td></tr>
+          <tr><td>Admin can add, edit and remove colours and patterns, reflected immediately</td><td class="ok">Met (end-to-end test)</td></tr>
+          <tr><td>Admin dashboard displays all four KPIs</td><td class="ok">Met (end-to-end test)</td></tr>
+          <tr><td>Unauthorised access to others' projects and admin routes is blocked</td><td class="ok">Met (API and end-to-end tests)</td></tr>
+          <tr><td>At least 6–7 interconnected pages integrated with backend and database</td><td class="ok">Met (11 pages)</td></tr>
+          <tr><td>Recolour under 300 ms for a 2000 px image</td><td class="ok">Met (~15 ms)</td></tr>
+          <tr><td>Live on a cloud environment with HTTPS</td><td class="ok">Deployment link provided with this submission</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ================= 17-18 ================= -->
+    <section class="chapter">
+      <h1>17. Future scope</h1>
+      <ul>
+        <li><strong>AI wall detection:</strong> automatic wall segmentation to replace manual selection, with the existing tools for corrections.</li>
+        <li><strong>Lighting simulation:</strong> day, evening and warm/cool light previews.</li>
+        <li><strong>Brand integration:</strong> catalogue sync with paint manufacturers, “buy this colour” links and quantity estimates from wall area.</li>
+        <li><strong>Mobile and AR:</strong> a native app and live camera preview.</li>
+        <li><strong>Sharing and collaboration:</strong> share a read-only design link with a client or family member.</li>
+        <li><strong>Performance:</strong> move pixel processing to a Web Worker for very large photos on low-end devices.</li>
+      </ul>
+
+      <h1 class="sub">18. Conclusion and learnings</h1>
+      <p>
+        Smart Wall Paint Visualizer meets the Phase 1 specification as a complete, end-to-end MEAN application:
+        eleven connected pages, a realistic browser-side rendering engine, secure handling of private photos, an
+        admin panel with live KPIs, and 194 automated tests running on every change.
+      </p>
+      <h2>Key learnings</h2>
+      <ul>
+        <li><strong>Image processing fundamentals:</strong> colour spaces, linear light and luminance turned out to be the key to realistic results.</li>
+        <li><strong>Building for real users:</strong> undo, auto-save, clear errors, a first-use guide and accessibility matter as much as the core feature.</li>
+        <li><strong>Security by design:</strong> validating files by content, signing private links and enforcing ownership on every request.</li>
+        <li><strong>Testing in a real browser finds real bugs:</strong> several issues (missing data, timing and keyboard focus problems) only appeared in end-to-end runs and were fixed before release.</li>
+        <li><strong>Working in small, reviewed steps:</strong> each feature was built on its own branch and merged through a pull request with automated checks.</li>
+      </ul>
+      <figure class="half">
+        <img src="images/tablet-studio.jpg" alt="Studio on a tablet-sized screen" />
+        <figcaption>Figure 16. The studio on a tablet-sized screen (1024 px).</figcaption>
+      </figure>
+    </section>
+
+    <!-- ================= appendix ================= -->
+    <section class="chapter newpage">
+      <h1>19. Appendix: running the project</h1>
+      <h2>Requirements</h2>
+      <p>Node.js 18 or later, Docker (for a local MongoDB) and Git.</p>
+      <h2>Steps</h2>
+      <div class="formula">
+        git clone https://github.com/novshita/smart-wall-paint-visualizer.git<br />
+        cd smart-wall-paint-visualizer<br />
+        docker compose up -d&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# MongoDB<br /><br />
+        cd server &amp;&amp; npm install &amp;&amp; cp .env.example .env<br />
+        npm run seed&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# colours, patterns, admin account<br />
+        npm run dev&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# API on http://localhost:5050<br /><br />
+        cd ../client &amp;&amp; npm install &amp;&amp; npm start&nbsp;&nbsp;# app on http://localhost:4200
+      </div>
+      <h2>Accounts and documentation</h2>
+      <ul>
+        <li><strong>Local admin account</strong> (created by the seed): <code>admin@swpv.local</code> / <code>ChangeMe123!</code>. For the live site, admin credentials are provided separately.</li>
+        <li><strong>API documentation:</strong> <code>http://localhost:5050/api/docs</code></li>
+        <li><strong>Tests:</strong> <code>npm test</code> in <code>server</code>; <code>npx ng test</code> in <code>client</code>; <code>npx playwright test</code> in <code>e2e</code>.</li>
+        <li><strong>Specification:</strong> <code>docs/spec.md</code> · <strong>Deployment guide:</strong> <code>docs/deployment.md</code></li>
+      </ul>
+    </section>
+  </body>
+</html>

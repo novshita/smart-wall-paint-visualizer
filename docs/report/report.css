@@ -1,0 +1,347 @@
+/* Print stylesheet for the project report (A4). Rendered to PDF by build-report.mjs. */
+@page {
+  size: A4;
+  margin: 20mm 18mm 22mm;
+}
+
+:root {
+  --brand: #1f6f78;
+  --brand-dark: #154e55;
+  --ink: #1d2427;
+  --muted: #5b666b;
+  --border: #dcd8d0;
+  --soft: #f4f2ee;
+  --accent: #e07a4f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: Inter, 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 10.5pt;
+  line-height: 1.55;
+  color: var(--ink);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+body {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.25;
+  color: var(--ink);
+  break-after: avoid;
+}
+
+h1 {
+  font-size: 20pt;
+  margin: 0 0 6mm;
+  padding-bottom: 3mm;
+  border-bottom: 2px solid var(--brand);
+}
+
+h2 {
+  font-size: 13.5pt;
+  margin: 7mm 0 2.5mm;
+  color: var(--brand-dark);
+}
+
+h3 {
+  font-size: 11pt;
+  margin: 5mm 0 1.5mm;
+}
+
+p {
+  margin: 0 0 3mm;
+}
+
+ul,
+ol {
+  margin: 0 0 3mm;
+  padding-left: 6mm;
+}
+
+li {
+  margin-bottom: 1mm;
+}
+
+a {
+  color: var(--brand);
+  text-decoration: none;
+}
+
+code {
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.88em;
+  padding: 0 1.2mm;
+  border-radius: 1mm;
+  background: var(--soft);
+}
+
+strong {
+  font-weight: 650;
+}
+
+.chapter {
+  margin-top: 9mm;
+}
+
+/* Only major parts start on a new page */
+.newpage {
+  break-before: page;
+  margin-top: 0;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+/* ---------- cover ---------- */
+.cover {
+  display: flex;
+  flex-direction: column;
+  height: 250mm;
+  padding-top: 18mm;
+}
+
+.cover .label {
+  margin: 0 0 4mm;
+  color: var(--brand);
+  font-size: 10pt;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.cover h1 {
+  border: none;
+  margin: 0 0 4mm;
+  padding: 0;
+  font-size: 32pt;
+  line-height: 1.1;
+}
+
+.cover .subtitle {
+  max-width: 140mm;
+  margin: 0 0 10mm;
+  color: var(--muted);
+  font-size: 13pt;
+}
+
+.cover .swatches {
+  display: flex;
+  height: 14mm;
+  margin-bottom: 12mm;
+  border-radius: 3mm;
+  overflow: hidden;
+}
+
+.cover .swatches span {
+  flex: 1;
+}
+
+.cover .hero {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 3mm;
+}
+
+.cover .meta {
+  margin-top: auto;
+  border-collapse: collapse;
+}
+
+.cover .meta th {
+  padding: 1.2mm 8mm 1.2mm 0;
+  color: var(--muted);
+  font-weight: 500;
+  text-align: left;
+  vertical-align: top;
+}
+
+.cover .meta td {
+  padding: 1.2mm 0;
+}
+
+/* ---------- contents ---------- */
+.toc ol {
+  padding-left: 0;
+  list-style: none;
+  counter-reset: toc;
+}
+
+.toc li {
+  display: flex;
+  padding: 1.6mm 0;
+  border-bottom: 1px dotted var(--border);
+  counter-increment: toc;
+}
+
+.toc li::before {
+  content: counter(toc) '.';
+  width: 9mm;
+  color: var(--brand);
+  font-weight: 600;
+}
+
+/* ---------- tables ---------- */
+table.data {
+  width: 100%;
+  margin: 2mm 0 4mm;
+  border-collapse: collapse;
+  font-size: 9.5pt;
+  break-inside: auto;
+}
+
+table.data th,
+table.data td {
+  padding: 1.8mm 2.4mm;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+table.data thead th {
+  background: var(--soft);
+  color: var(--muted);
+  font-size: 8.5pt;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+table.data tr {
+  break-inside: avoid;
+}
+
+table.data .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ok {
+  color: #1e6b1e;
+  font-weight: 600;
+}
+
+.partial {
+  color: #8a5a00;
+  font-weight: 600;
+}
+
+/* ---------- figures ---------- */
+figure {
+  margin: 3mm 0 5mm;
+  break-inside: avoid;
+}
+
+figure img,
+figure svg {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 2mm;
+}
+
+/* Keep screenshots from taking a whole page: crop tall ones from the top */
+figure img {
+  max-height: 92mm;
+  object-fit: cover;
+  object-position: top;
+}
+
+figure.pair img {
+  max-height: 62mm;
+}
+
+figure svg {
+  border: none;
+}
+
+figure.half img {
+  width: 75%;
+  margin: 0 auto;
+}
+
+figure.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4mm;
+}
+
+figure.pair figcaption {
+  grid-column: span 2;
+}
+
+figcaption {
+  margin-top: 1.8mm;
+  color: var(--muted);
+  font-size: 9pt;
+  text-align: center;
+}
+
+/* ---------- callouts & stats ---------- */
+.callout {
+  margin: 3mm 0 4mm;
+  padding: 3mm 4mm;
+  border-left: 3px solid var(--brand);
+  border-radius: 0 2mm 2mm 0;
+  background: #eef6f7;
+  break-inside: avoid;
+}
+
+.callout.warn {
+  border-color: var(--accent);
+  background: #fff6ee;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3mm;
+  margin: 3mm 0 5mm;
+  break-inside: avoid;
+}
+
+.stat {
+  padding: 3mm;
+  border: 1px solid var(--border);
+  border-radius: 2mm;
+}
+
+.stat b {
+  display: block;
+  font-size: 17pt;
+  line-height: 1.2;
+}
+
+.stat span {
+  color: var(--muted);
+  font-size: 8.5pt;
+}
+
+.formula {
+  margin: 3mm 0 4mm;
+  padding: 3mm 4mm;
+  border-radius: 2mm;
+  background: var(--soft);
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 9.5pt;
+  line-height: 1.7;
+  break-inside: avoid;
+}
+
+.keep {
+  break-inside: avoid;
+}
+
+h1.sub {
+  margin-top: 9mm;
+}
