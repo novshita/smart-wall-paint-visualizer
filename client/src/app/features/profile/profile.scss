@@ -42,6 +42,23 @@ form {
   color: var(--mat-sys-on-error-container);
 }
 
+.favourites {
+  margin-top: var(--swpv-space-7);
+
+  h2 {
+    font-size: 1.2rem;
+  }
+}
+
+.fav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--swpv-space-4);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
 @include tablet-down {
   .grid {
     grid-template-columns: 1fr;

@@ -32,5 +32,27 @@
     </div>
   </section>
 
+  <section class="section" aria-labelledby="fav-heading">
+    <div class="section-head">
+      <h2 id="fav-heading">Favourite colours</h2>
+      @if (favoriteCount() > favoriteColors().length) {
+        <a mat-button routerLink="/profile" fragment="favourites">See all {{ favoriteCount() }}</a>
+      }
+    </div>
+    @if (favoriteColors().length) {
+      <ul class="fav-grid">
+        @for (color of favoriteColors(); track color._id) {
+          <li><app-swatch-card [color]="color" [compact]="true" /></li>
+        }
+      </ul>
+    } @else {
+      <div class="empty">
+        <mat-icon aria-hidden="true">favorite</mat-icon>
+        <p>Tap the heart on any colour to save it here.</p>
+        <a mat-stroked-button routerLink="/colors">Browse colours</a>
+      </div>
+    }
+  </section>
+
   <app-disclaimer [compact]="true" />
 </section>

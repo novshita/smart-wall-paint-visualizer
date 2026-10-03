@@ -119,4 +119,20 @@
       </form>
     </article>
   </div>
+
+  <section id="favourites" class="favourites" aria-labelledby="fav-heading">
+    <h2 id="fav-heading">Favourite colours</h2>
+    @if (favorites.colors().length) {
+      <ul class="fav-grid">
+        @for (color of favorites.colors(); track color._id) {
+          <li><app-swatch-card [color]="color" [compact]="true" /></li>
+        }
+      </ul>
+    } @else if (!favorites.loading()) {
+      <p class="muted">
+        You haven't saved any colours yet. <a routerLink="/colors">Browse the colour library</a>
+        and tap the heart on the ones you like.
+      </p>
+    }
+  </section>
 </section>

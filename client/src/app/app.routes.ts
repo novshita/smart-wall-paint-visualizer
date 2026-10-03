@@ -44,6 +44,23 @@ export const routes: Routes = [
         loadComponent: () => import('./features/profile/profile').then((m) => m.Profile),
       },
       {
+        path: 'colors',
+        children: [
+          {
+            path: '',
+            title: 'Colour library · Wall Visualizer',
+            loadComponent: () =>
+              import('./features/colors/color-library').then((m) => m.ColorLibrary),
+          },
+          {
+            path: ':id',
+            title: 'Colour · Wall Visualizer',
+            loadComponent: () =>
+              import('./features/colors/color-detail').then((m) => m.ColorDetail),
+          },
+        ],
+      },
+      {
         path: 'help',
         title: 'How to use · Wall Visualizer',
         loadComponent: () => import('./features/help/help').then((m) => m.Help),

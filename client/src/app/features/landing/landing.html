@@ -17,6 +17,23 @@
   </div>
 </section>
 
+@if (featured().length) {
+  <section class="page featured" aria-labelledby="featured-heading">
+    <div class="section-head">
+      <h2 id="featured-heading">Featured colours</h2>
+      <a mat-button routerLink="/colors">
+        See all colours
+        <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+      </a>
+    </div>
+    <ul class="featured-grid">
+      @for (color of featured(); track color._id) {
+        <li><app-swatch-card [color]="color" [compact]="true" /></li>
+      }
+    </ul>
+  </section>
+}
+
 <section class="page steps" aria-labelledby="how-heading">
   <h2 id="how-heading">How it works</h2>
   <ol>

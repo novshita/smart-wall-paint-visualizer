@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { hexToRgb } = require('../utils/color');
 
 const FINISHES = ['matte', 'satin', 'glossy'];
 
@@ -23,11 +24,10 @@ const colorSchema = new mongoose.Schema(
 );
 
 // Keep rgb in sync with hex so both are always consistent (spec §23 rule 4)
+// (document saves only; bulk/update paths such as the seed must set rgb themselves)
 colorSchema.pre('validate', function syncRgb() {
-  if (this.hex && /^#[0-9A-Fa-f]{6}$/.test(this.hex)) {
-    const n = parseInt(this.hex.slice(1), 16);
-    this.rgb = { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
-  }
+  const rgb = hexToRgb(this.hex);
+  if (rgb) this.rgb = rgb;
 });
 
 colorSchema.index({ name: 'text', code: 'text' });

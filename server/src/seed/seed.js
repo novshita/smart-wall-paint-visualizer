@@ -5,6 +5,7 @@ const { User, Color, Pattern, Setting } = require('../models');
 const colors = require('./colors');
 const patterns = require('./patterns');
 const settings = require('./settings');
+const { hexToRgb } = require('../utils/color');
 
 /**
  * Idempotent seed: upserts by natural key, so it is safe to run repeatedly
@@ -14,10 +15,11 @@ async function seed() {
   await connectDb(env.mongoUri);
   await Promise.all([User.init(), Color.init(), Pattern.init(), Setting.init()]);
 
-  for (const c of colors) {
+  for (const { hex, ...rest } of colors) {
+    // hex/rgb are always (re)set so they stay consistent; other fields are only set on insert
     await Color.updateOne(
-      { code: c.code },
-      { $setOnInsert: c },
+      { code: rest.code },
+      { $setOnInsert: rest, $set: { hex, rgb: hexToRgb(hex) } },
       { upsert: true, runValidators: true },
     );
   }
