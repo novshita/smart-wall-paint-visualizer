@@ -12,7 +12,10 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { AuthService } from '../../core/auth/auth.service';
+import { GuideDialog } from './guide-dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ProjectService } from '../../core/projects/project.service';
 import { EditorStore } from '../../core/editor/editor.store';
@@ -43,6 +46,8 @@ import { ApiError } from '../../shared/models/api-error.model';
 export class EditorShell {
   readonly store = inject(EditorStore);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly dialog = inject(MatDialog);
+  private readonly auth = inject(AuthService);
 
   /** Route param */
   readonly id = input.required<string>();
@@ -77,6 +82,7 @@ export class EditorShell {
         if (this.store.project()?._id === project._id) return;
         this.store.load(project);
         this.loadImage(project.workingImage.url);
+        this.showGuideOnce();
       });
     });
   }
@@ -87,6 +93,22 @@ export class EditorShell {
       inputEl.value = this.store.project()?.title ?? '';
       this.snackBar.open(`Couldn't rename: ${err.message}`, 'OK', { duration: 4000 });
     });
+  }
+
+  protected openGuide(): void {
+    this.dialog.open(GuideDialog, { autoFocus: 'first-tabbable' });
+  }
+
+  /** First editor visit for this user: show the walkthrough (spec §7). */
+  private showGuideOnce(): void {
+    const key = `swpv.guideSeen.${this.auth.user()?._id ?? 'anon'}`;
+    try {
+      if (localStorage.getItem(key)) return;
+      localStorage.setItem(key, '1');
+    } catch {
+      return;
+    }
+    setTimeout(() => this.openGuide(), 600);
   }
 
   protected retrySave(): void {

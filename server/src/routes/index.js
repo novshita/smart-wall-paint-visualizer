@@ -8,6 +8,8 @@ const projectRoutes = require('./project.routes');
 const fileRoutes = require('./file.routes');
 const settingsRoutes = require('./settings.routes');
 const activityRoutes = require('./activity.routes');
+const adminRoutes = require('./admin.routes');
+const feedbackRoutes = require('./feedback.routes');
 
 // Feature routers (auth, projects, colors, ...) are mounted here as they are built.
 const router = Router();
@@ -21,5 +23,7 @@ router.use('/projects', projectRoutes);
 router.use('/files', fileRoutes);
 router.use('/settings', settingsRoutes);
 router.use('/activity', activityRoutes);
+router.use('/feedback', feedbackRoutes);
+router.use('/admin', adminRoutes);
 
 module.exports = router;

@@ -32,6 +32,7 @@ import { buildLayers, describeStyle } from '../../core/editor/layers';
 import { PaintLayer } from '../../core/editor/paint-engine';
 import { PatternService } from '../../core/editor/pattern.service';
 import { ProjectService } from '../../core/projects/project.service';
+import { FeedbackService } from '../../core/analytics/feedback.service';
 import { SettingsService } from '../../core/settings/settings.service';
 import { Disclaimer } from '../../shared/components/disclaimer/disclaimer';
 import { WallList, WallPaint } from '../../shared/components/wall-list/wall-list';
@@ -76,6 +77,7 @@ export class Studio {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly recent = inject(RecentColorsService);
+  private readonly feedback = inject(FeedbackService);
 
   /** ?colorId= from "Try on my room": applied to the first unpainted wall */
   readonly colorId = input<string>();
@@ -261,6 +263,7 @@ export class Studio {
       );
       progress.dismiss();
       this.snackBar.open('Downloaded', 'OK', { duration: 3000 });
+      setTimeout(() => this.feedback.maybeAsk(project._id), 1200);
 
       this.projects
         .logActivity({

@@ -1,0 +1,166 @@
+@use 'tokens' as *;
+
+.head h1 {
+  margin-bottom: var(--swpv-space-1);
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: var(--swpv-space-2);
+  margin: var(--swpv-space-4) 0 var(--swpv-space-5);
+}
+
+.body {
+  transition: opacity 150ms ease;
+
+  &.dim {
+    opacity: 0.6;
+  }
+}
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--swpv-space-4);
+}
+
+.tile {
+  position: relative;
+  padding: var(--swpv-space-4) var(--swpv-space-5);
+  border: 1px solid var(--swpv-border);
+  border-radius: var(--swpv-radius);
+  background: #fff;
+
+  h2 {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #52514e;
+  }
+
+  .value {
+    margin: var(--swpv-space-1) 0 0;
+    font-size: 2rem;
+    font-weight: 600;
+    color: #0b0b0b;
+  }
+
+  .unit {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #52514e;
+  }
+
+  .sub {
+    margin: 2px 0 0;
+    font-size: 0.8rem;
+    color: #52514e;
+  }
+}
+
+.spark {
+  display: block;
+  width: 100%;
+  height: 30px;
+  margin-top: var(--swpv-space-2);
+
+  polyline {
+    fill: none;
+    stroke: #c3c2b7;
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+  }
+
+  circle {
+    fill: #2a78d6;
+  }
+}
+
+.people {
+  display: flex;
+  align-items: center;
+  gap: var(--swpv-space-2);
+  margin: var(--swpv-space-4) 0;
+  font-size: 0.85rem;
+}
+
+.card {
+  margin-bottom: var(--swpv-space-4);
+  padding: var(--swpv-space-4) var(--swpv-space-5);
+  border: 1px solid var(--swpv-border);
+  border-radius: var(--swpv-radius);
+  background: #fff;
+
+  h2 {
+    margin: 0 0 var(--swpv-space-3);
+    font-size: 1rem;
+  }
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--swpv-space-4);
+
+  .card {
+    margin: 0;
+  }
+}
+
+.table-wrap {
+  max-height: 320px;
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+
+  th,
+  td {
+    padding: 6px var(--swpv-space-2);
+    border-bottom: 1px solid var(--swpv-border);
+    text-align: right;
+  }
+
+  th[scope='row'],
+  thead th:first-child {
+    text-align: left;
+    font-weight: 500;
+  }
+
+  thead th {
+    position: sticky;
+    top: 0;
+    background: #fff;
+    color: #52514e;
+  }
+}
+
+.state {
+  padding: var(--swpv-space-6);
+  text-align: center;
+}
+
+@include tablet-down {
+  .kpis {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pair {
+    grid-template-columns: 1fr;
+  }
+}

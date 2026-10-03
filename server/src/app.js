@@ -18,6 +18,14 @@ function createApp() {
   app.disable('x-powered-by');
   app.set('trust proxy', 1);
 
+  // Behind the hosting platform's proxy: send plain-HTTP visitors to HTTPS (spec §12)
+  if (env.isProduction) {
+    app.use((req, res, next) => {
+      if (req.secure || req.path === '/api/v1/health') return next();
+      res.redirect(308, `https://${req.headers.host}${req.originalUrl}`);
+    });
+  }
+
   app.use(helmet());
   app.use(
     cors({

@@ -1,0 +1,8 @@
+node_modules
+uploads
+coverage
+tests
+.env
+.env.*
+!.env.example
+public/patterns/custom

@@ -9,39 +9,14 @@
 </div>
 
 @if (store.regions().length) {
-  <ul
-    class="walls"
-    role="listbox"
-    aria-label="Walls"
-    [attr.aria-activedescendant]="store.activeRegionId() ? 'wall-' + store.activeRegionId() : null"
-  >
+  <ul class="walls" aria-label="Walls">
     @for (region of store.regions(); track region.regionId; let i = $index) {
       @let active = region.regionId === store.activeRegionId();
       @let painted = paint()[region.regionId];
-      <li
-        [id]="'wall-' + region.regionId"
-        class="wall"
-        [class.active]="active"
-        role="option"
-        [attr.aria-selected]="active"
-        tabindex="0"
-        (click)="store.activeRegionId.set(region.regionId)"
-        (keydown.enter)="store.activeRegionId.set(region.regionId)"
-        (keydown.space)="store.activeRegionId.set(region.regionId); $event.preventDefault()"
-      >
-        @if (mode() === 'paint') {
-          <span
-            class="chip paint"
-            [class.empty]="!painted"
-            [style.background]="painted?.hex ?? null"
-            aria-hidden="true"
-          ></span>
-        } @else {
-          <span class="chip" [style.background]="overlayColor(i)" aria-hidden="true"></span>
-        }
-
-        <span class="text">
-          @if (editingId() === region.regionId) {
+      <li class="wall" [class.active]="active">
+        @if (editingId() === region.regionId) {
+          <span class="pick editing">
+            <ng-container *ngTemplateOutlet="chip; context: { $implicit: i, painted: painted }" />
             <input
               [id]="'rename-' + region.regionId"
               class="rename"
@@ -53,19 +28,29 @@
               (keydown.escape)="editingId.set(null)"
               (blur)="finishRename(region, $any($event.target).value)"
             />
-          } @else {
-            <span class="name">{{ region.name }}</span>
-          }
-          <span class="sub">
-            @if (!hasArea(region.selection)) {
-              Not selected yet
-            } @else if (mode() === 'paint') {
-              {{ painted?.label ?? 'No paint yet' }}
-            } @else {
-              Selected
-            }
           </span>
-        </span>
+        } @else {
+          <button
+            type="button"
+            class="pick"
+            [attr.aria-pressed]="active"
+            (click)="store.activeRegionId.set(region.regionId)"
+          >
+            <ng-container *ngTemplateOutlet="chip; context: { $implicit: i, painted: painted }" />
+            <span class="text">
+              <span class="name">{{ region.name }}</span>
+              <span class="sub">
+                @if (!hasArea(region.selection)) {
+                  Not selected yet
+                } @else if (mode() === 'paint') {
+                  {{ painted?.label ?? 'No paint yet' }}
+                } @else {
+                  Selected
+                }
+              </span>
+            </span>
+          </button>
+        }
 
         @if (mode() === 'select') {
           <button
@@ -99,3 +84,16 @@
     }
   </p>
 }
+
+<ng-template #chip let-i let-painted="painted">
+  @if (mode() === 'paint') {
+    <span
+      class="chip paint"
+      [class.empty]="!painted"
+      [style.background]="painted?.hex ?? null"
+      aria-hidden="true"
+    ></span>
+  } @else {
+    <span class="chip" [style.background]="overlayColor(i)" aria-hidden="true"></span>
+  }
+</ng-template>

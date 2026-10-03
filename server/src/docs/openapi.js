@@ -5,6 +5,16 @@
 const auth = require('./paths/auth');
 const catalog = require('./paths/catalog');
 const projects = require('./paths/projects');
+const admin = require('./paths/admin');
+
+// Merge admin write operations (POST/PUT/DELETE) into the public catalogue paths
+function mergePaths(...sets) {
+  const out = {};
+  for (const set of sets) {
+    for (const [path, ops] of Object.entries(set)) out[path] = { ...out[path], ...ops };
+  }
+  return out;
+}
 
 module.exports = {
   openapi: '3.0.3',
@@ -40,9 +50,7 @@ module.exports = {
     },
   },
   paths: {
-    ...auth.paths,
-    ...catalog.paths,
-    ...projects.paths,
+    ...mergePaths(auth.paths, catalog.paths, admin.catalogWrites, projects.paths, admin.paths),
     '/health': {
       get: {
         tags: ['System'],

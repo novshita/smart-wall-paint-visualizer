@@ -10,17 +10,19 @@
 
 **Smart Wall Paint Visualizer** is a web app built on the **MEAN stack** (MongoDB, Express, Angular, Node.js). Upload a photo of your room, select the walls, try different colours and designs, and compare the before and after, all in your browser.
 
-🔗 **Live demo:** _coming soon_ (add your deployed URL here)
+🔗 **Live demo:** _add your deployed URL here_ (see the [deployment guide](docs/deployment.md))
 
 ---
 
 ## 📸 Screenshots
 
-_Add screenshots or a short GIF here once the UI is ready._
-
-| Upload | Wall Selection | Colour Preview |
-|:------:|:--------------:|:--------------:|
-| `docs/screenshots/upload.png` | `docs/screenshots/select.png` | `docs/screenshots/studio.png` |
+| Select walls | Paint: two-tone and patterns |
+|:------------:|:----------------------------:|
+| ![Wall selection with polygon and eraser](docs/screenshots/wall-selection.jpg) | ![Studio with a two-tone wall and a chevron pattern](docs/screenshots/studio-two-tone-pattern.jpg) |
+| **Compare two designs** | **My designs** |
+| ![Comparing two design variants with a slider](docs/screenshots/studio-compare-designs.jpg) | ![Saved designs grid with painted thumbnails](docs/screenshots/my-designs.jpg) |
+| **Colour library** | **Admin dashboard** |
+| ![Colour library with family filters](docs/screenshots/colour-library.jpg) | ![Admin KPI dashboard](docs/screenshots/admin-dashboard.jpg) |
 
 ---
 
@@ -39,21 +41,23 @@ Choosing a wall colour is hard. Shade cards don't show how a colour looks in *yo
 
 **For users**
 - 🔐 Register and log in securely
-- 🖼️ Upload room photos (JPG/PNG)
-- ✏️ Select walls manually with **brush** or **polygon** tools (with undo/redo, zoom and pan)
-- 🎨 Apply solid colours, **dual-tone walls**, and basic patterns
-- 🎚️ Adjust opacity, brightness, and finish (matte, satin, glossy)
-- 🔀 Try multiple design variants on one image
+- 🖼️ Upload room photos (JPG/PNG); location data is stripped and photos stay private
+- ✏️ Select walls with **polygon**, **brush** and **eraser** tools, with undo/redo, zoom, pan and soft edges
+- 🎨 Paint walls with **solid colours**, **two-tone splits** or **patterns**, from the library or any HEX code
+- 💡 Realistic rendering that keeps your photo's light, shadows and texture
+- 🎚️ Adjust opacity, brightness and finish (matte, satin, glossy)
+- 🔀 Try several **design variants** on one photo and compare them side by side
 - 👀 Compare **before and after** with a slider
-- 💾 Save projects, reopen and edit them later
-- ⬇️ Download the final image
-- ⭐ Favourite colours and patterns
+- 💾 Auto-save, reopen, rename, duplicate and delete designs
+- ⬇️ Download full-resolution PNG/JPG, or a before-and-after image, with colour names and codes
+- ⭐ Favourite colours and quick access to recently used ones
+- 🧭 First-use guide and an in-app **How to use** page
 
 **For admins**
-- 🗂️ Manage paint colours, shade details, and patterns
-- 👥 Manage users and view activity and saved designs
-- ⚙️ Configure system settings
-- 📊 View a KPI dashboard (uploads, saved designs, session time, satisfaction)
+- 🗂️ Manage paint colours (with CSV/JSON bulk import) and pattern tiles
+- 👥 Manage users (roles, deactivate), and view all designs and activity
+- ⚙️ Configure upload limits, formats, default finish and the disclaimer text
+- 📊 KPI dashboard: uploads, saved designs, average session time and user satisfaction, with trends and top colours
 
 > ℹ️ **Note:** Results are a visual guide. Actual colours may vary due to lighting, screen calibration, and wall texture.
 
@@ -63,11 +67,12 @@ Choosing a wall colour is hard. Shade cards don't show how a colour looks in *yo
 
 | Layer | Technology |
 |-------|-----------|
-| **Frontend** | Angular 22 (standalone components), Angular Material, TypeScript, HTML5 Canvas, SVG, SCSS |
-| **Backend** | Node.js, Express.js, RESTful APIs, JWT authentication |
+| **Frontend** | Angular 22 (standalone components, signals), Angular Material, TypeScript, HTML5 Canvas, SVG, SCSS |
+| **Backend** | Node.js, Express 5, RESTful APIs, JWT authentication, Joi validation, sharp |
 | **Database** | MongoDB (Mongoose) |
-| **Storage** | AWS S3 (or local disk in development) |
-| **Deployment** | Vercel / Netlify (frontend), AWS or similar (backend), MongoDB Atlas |
+| **Storage** | AWS S3 with presigned links (local disk in development) |
+| **Testing** | Mocha + Supertest (API), Vitest (app), Playwright (end-to-end) |
+| **Deployment** | Vercel (app), Render with Docker (API), MongoDB Atlas, GitHub Actions |
 
 ---
 
@@ -78,7 +83,6 @@ Choosing a wall colour is hard. Shade cards don't show how a colour looks in *yo
 - [Node.js](https://nodejs.org/) 18 or later
 - [Docker](https://www.docker.com/) (runs MongoDB locally), or a free [MongoDB Atlas](https://www.mongodb.com/atlas) cluster
 - Angular CLI is optional; the commands below use `npx ng`
-- Git
 
 ### 1. Clone the repository
 
@@ -103,26 +107,7 @@ npm install
 cp .env.example .env
 ```
 
-Open `.env` and fill in your values (at minimum, set a long random `JWT_SECRET`):
-
-```env
-PORT=5050
-MONGODB_URI=mongodb://localhost:27017/wall-paint-visualizer
-JWT_SECRET=replace_with_a_long_random_string
-JWT_EXPIRES_IN=1h
-CLIENT_URL=http://localhost:4200
-MAX_UPLOAD_MB=10
-
-# Seed admin account (used by `npm run seed`)
-ADMIN_EMAIL=admin@swpv.local
-ADMIN_PASSWORD=ChangeMe123!
-
-# Optional: cloud image storage
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-AWS_S3_BUCKET=
-AWS_REGION=
-```
+Open `.env` and set at least a long random `JWT_SECRET`. The defaults work for local development; every variable is explained in the [deployment guide](docs/deployment.md#environment-variables-api).
 
 Seed the database with sample colours, patterns, default settings, and an admin account (safe to run more than once):
 
@@ -148,9 +133,9 @@ npm install
 npm start
 ```
 
-During development, `/api` and `/static` requests are proxied to the API (`client/proxy.conf.json`), so no CORS setup is needed.
+Open **http://localhost:4200** in your browser. 🎉 Log in as the admin (`ADMIN_EMAIL` / `ADMIN_PASSWORD` from `.env`) to see the **Admin** panel.
 
-Open **http://localhost:4200** in your browser. 🎉
+During development, `/api` and `/static` requests are proxied to the API (`client/proxy.conf.json`), so no CORS setup is needed.
 
 ---
 
@@ -158,11 +143,10 @@ Open **http://localhost:4200** in your browser. 🎉
 
 1. **Sign up or log in.**
 2. **Upload** a clear photo of your room.
-3. **Select the wall** using the polygon or brush tool. Zoom in for precision.
-4. **Pick a colour or pattern** from the library, or enter your own HEX code.
-5. **Fine-tune** opacity, finish, and brightness.
-6. **Compare** before and after with the slider.
-7. **Save** your design or **download** the image.
+3. **Select the walls** with the polygon or brush tool, and erase windows and furniture.
+4. **Paint**: pick a colour or pattern, choose solid, two-tone or pattern, and fine-tune the finish.
+5. **Compare** before and after, or two design ideas, with the slider.
+6. **Save** your design and **download** the image.
 
 > Tip: Photos taken in good, even lighting give the most realistic results.
 
@@ -172,52 +156,53 @@ Open **http://localhost:4200** in your browser. 🎉
 
 ```
 smart-wall-paint-visualizer/
-├── client/                 # Angular frontend
+├── client/                 # Angular app
 │   └── src/app/
-│       ├── core/           # auth, guards, interceptors
-│       ├── shared/         # reusable components & models
-│       └── features/       # landing, auth, dashboard, upload,
-│                           # wall-selection, studio, colors,
-│                           # projects, profile, help, admin
-├── server/                 # Node + Express backend
+│       ├── core/           # auth, editor engine (rendering, masks, store), services
+│       ├── shared/         # reusable components, models, utilities
+│       └── features/       # landing, auth, dashboard, upload, wall-selection,
+│                           # studio, colors, projects, profile, help, admin
+├── server/                 # Node + Express API
 │   └── src/
-│       ├── config/
-│       ├── models/         # Mongoose schemas
-│       ├── routes/
-│       ├── controllers/
-│       ├── services/
-│       └── middleware/
+│       ├── config/  models/  routes/  controllers/
+│       ├── services/       # images, storage (local/S3), analytics, imports
+│       ├── middleware/  validators/  docs/ (OpenAPI)
+│       └── seed/  scripts/
+├── e2e/                    # Playwright end-to-end tests
 ├── docs/
-│   └── spec.md             # Full product & technical specification
-└── README.md
+│   ├── spec.md             # Product & technical specification
+│   ├── deployment.md       # How to deploy (Atlas, S3, Render, Vercel)
+│   └── screenshots/
+├── docker-compose.yml      # Local MongoDB
+├── render.yaml             # API hosting blueprint
+└── .github/workflows/      # CI/CD
 ```
 
 ---
 
 ## 🔌 API Overview
 
-Base URL: `/api/v1`
+Base URL: `/api/v1` · Interactive docs (Swagger): `http://localhost:5050/api/docs`
 
 | Area | Example Endpoints |
 |------|------------------|
-| Auth | `POST /auth/register`, `POST /auth/login`, `GET /auth/me` |
-| Projects | `GET /projects`, `POST /projects`, `PUT /projects/:id`, `DELETE /projects/:id` |
-| Colours | `GET /colors`, `GET /colors/:id` (admin: create, update, delete, import) |
-| Patterns | `GET /patterns` (admin: create, update, delete) |
+| Auth | `POST /auth/register`, `POST /auth/login`, `GET /auth/me`, `PATCH /auth/password` |
+| Projects | `GET /projects`, `POST /projects` (upload), `PUT /projects/:id`, `POST /projects/:id/duplicate`, `DELETE /projects/:id` |
+| Colours & patterns | `GET /colors`, `GET /colors/:id`, `GET /patterns` (admins: create, update, remove, `POST /colors/import`) |
 | Favourites | `GET /me/favorites`, `POST /me/favorites/colors/:id` |
-| Admin | `GET /admin/users`, `GET /admin/activity`, `GET /admin/analytics` |
-
-Full interactive API docs (Swagger): `http://localhost:5050/api/docs`
+| Admin | `GET /admin/analytics`, `GET /admin/users`, `GET /admin/activity`, `GET/PUT /admin/settings` |
+| Tracking | `POST /activity`, `POST /feedback` |
 
 ---
 
 ## 🔒 Security
 
-- Passwords are hashed with bcrypt
-- JWT-based authentication with role-based access (User / Admin)
-- Upload validation (file type, signature, and size limits)
-- Helmet, CORS allow-list, rate limiting, and input sanitisation
-- Users can only access their own projects
+- Passwords hashed with bcrypt; JWT sessions that end on password change or deactivation
+- Role-based access (User / Admin) on both the API and the app; users only see their own designs
+- Upload checks by file content, size limits, and re-encoding that strips hidden data and GPS location
+- Private images served through expiring signed links (HMAC locally, S3 presigned URLs in production)
+- Helmet headers, CORS allow-list, rate limiting, NoSQL-injection sanitisation, HTTPS redirect + HSTS
+- `npm audit` runs in CI; the app passes automated WCAG 2.1 AA checks (axe)
 
 > Please upload only room images that you own or have permission to use.
 
@@ -235,7 +220,20 @@ npm run lint
 cd client
 npx ng test --watch=false
 npx ng lint
+
+# End-to-end (Playwright; reuses the API and app if they're running)
+cd e2e
+npm install
+npx playwright install chromium   # first time only, or use your installed Chrome
+npx playwright test
+cd ../server && npm run e2e:clean  # remove the test accounts from your dev database
 ```
+
+---
+
+## ☁️ Deployment
+
+See the step-by-step **[deployment guide](docs/deployment.md)**: MongoDB Atlas, an S3 bucket, the API on Render (Docker), the app on Vercel with your domain and HTTPS, and GitHub Actions for continuous deployment.
 
 ---
 
@@ -251,8 +249,9 @@ npx ng lint
 - [x] Solid colour application with realistic blending, finishes, before/after, auto-save
 - [x] Dual-tone walls, patterns, and design variants (with side-by-side variant comparison)
 - [x] Save, reopen, and download designs (full-resolution PNG/JPG, before/after export, Saved Designs page)
-- [ ] Admin panel and KPI dashboard
-- [ ] Cloud deployment
+- [x] Admin panel and KPI dashboard
+- [x] Hardening, tests, documentation, and deployment setup
+- [ ] Live deployment with a custom domain
 
 **Future ideas**
 - AI-based automatic wall detection
@@ -280,7 +279,9 @@ Please follow the existing code style (ESLint and Prettier) and keep changes foc
 ## 📄 Documentation
 
 - 📘 [Full specification](docs/spec.md)
+- ☁️ [Deployment guide](docs/deployment.md)
 - 🔌 API docs: available at `/api/docs` when the server is running
+- 🧭 User guide: the **How to use** page in the app
 
 ---
 
