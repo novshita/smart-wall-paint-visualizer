@@ -58,7 +58,8 @@ jobs:
     env:
       CI: true
       NODE_ENV: development
-      PORT: 5050
+      # No PORT here: Angular's dev server also reads it (and it overrides --port).
+      # The API defaults to 5050; the app is pinned to 4200 in e2e/playwright.config.ts.
       MONGODB_URI: mongodb://localhost:27017/swpv-e2e
       JWT_SECRET: ci-only-jwt-secret-not-used-anywhere-else
       CLIENT_URL: http://localhost:4200

@@ -37,7 +37,9 @@ export default defineConfig({
       timeout: 60_000,
     },
     {
-      command: 'npm start',
+      // `ng serve` reads PORT (and it beats --port), so pin it to 4200 for the app
+      command: 'npx ng serve --port 4200',
+      env: { PORT: '4200' },
       cwd: '../client',
       url: 'http://localhost:4200',
       reuseExistingServer: !CI,
