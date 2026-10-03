@@ -5,8 +5,118 @@
 }
 
 h2 {
-  margin: 0 0 var(--swpv-space-2);
+  margin: 0 0 var(--swpv-space-3);
   font-size: 1rem;
+}
+
+.modes,
+.full {
+  width: 100%;
+  margin-bottom: var(--swpv-space-3);
+
+  mat-button-toggle {
+    flex: 1;
+    font-size: 0.85rem;
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    vertical-align: -4px;
+  }
+}
+
+.slots {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--swpv-space-2);
+}
+
+.slot {
+  display: flex;
+  gap: var(--swpv-space-2);
+  align-items: center;
+  min-height: 64px;
+  padding: var(--swpv-space-2);
+  border: 1px solid var(--swpv-border);
+  border-radius: var(--swpv-radius-sm);
+  background: #fff;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+
+  &.on {
+    border-color: var(--swpv-brand);
+    box-shadow: 0 0 0 2px var(--swpv-brand);
+  }
+}
+
+.slot-swatch {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgb(0 0 0 / 12%);
+  border-radius: 8px;
+  background: repeating-linear-gradient(45deg, #fff, #fff 4px, #e7e3dc 4px, #e7e3dc 8px);
+}
+
+.slot-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.slot-label {
+  font-size: 0.72rem;
+  color: var(--swpv-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.slot-name {
+  overflow: hidden;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.slot-meta {
+  font-size: 0.75rem;
+  color: var(--swpv-muted);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--swpv-space-2);
+}
+
+.patterns {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin: var(--swpv-space-1) 0 var(--swpv-space-2);
+  padding: 4px;
+  list-style: none;
+}
+
+.pattern {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border: 1px solid var(--swpv-border);
+  border-radius: 8px;
+  background-color: #fff;
+  background-size: 32px;
+  cursor: pointer;
+
+  &.current {
+    outline: 3px solid var(--swpv-ink);
+    outline-offset: 2px;
+  }
 }
 
 .applied {

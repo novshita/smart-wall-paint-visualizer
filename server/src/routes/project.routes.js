@@ -15,6 +15,15 @@ router.post('/', uploadLimiter, uploadImage('image'), validate(schemas.createPro
 router.get('/', validate(schemas.listProjects, 'query'), ctrl.list);
 router.get('/:id', validate(idParam, 'params'), ctrl.getById);
 router.put('/:id', validate(idParam, 'params'), validate(schemas.updateProject), ctrl.update);
+router.post(
+  '/:id/render',
+  uploadLimiter,
+  validate(idParam, 'params'),
+  uploadImage('image'),
+  validate(schemas.renderUpload),
+  ctrl.render,
+);
+router.post('/:id/duplicate', validate(idParam, 'params'), ctrl.duplicate);
 router.delete('/:id', validate(idParam, 'params'), ctrl.remove);
 
 module.exports = router;

@@ -8,6 +8,7 @@ import { Disclaimer } from '../../shared/components/disclaimer/disclaimer';
 import { SwatchCard } from '../../shared/components/swatch-card/swatch-card';
 import { FavoritesService } from '../../core/catalog/favorites.service';
 import { ProjectService } from '../../core/projects/project.service';
+import { Project } from '../../shared/models/project.model';
 
 /** Signed-in home: quick start, recent designs, and favourite colours. */
 @Component({
@@ -26,4 +27,13 @@ export class Dashboard {
   protected readonly favoriteCount = computed(() => this.favorites.colors().length);
 
   protected readonly recent = inject(ProjectService).projects(() => ({ limit: 4 }));
+
+  protected thumbnail(p: Project): string {
+    return p.variants.find((v) => v.renderUrl)?.renderUrl ?? p.thumbnailUrl;
+  }
+
+  protected openLink(p: Project): string[] {
+    const started = p.status === 'saved' || p.variants.some((v) => v.renderUrl);
+    return ['/projects', p._id, started ? 'studio' : 'select'];
+  }
 }

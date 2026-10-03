@@ -54,6 +54,7 @@ const style = Joi.object({
   colorId: objectId,
   secondaryColorId: objectId,
   customHex: Joi.string().pattern(/^#[0-9a-fA-F]{6}$/),
+  secondaryCustomHex: Joi.string().pattern(/^#[0-9a-fA-F]{6}$/),
   patternId: objectId,
   split: Joi.object({
     direction: Joi.string().valid('horizontal', 'vertical'),
@@ -85,7 +86,12 @@ const updateProject = Joi.object({
   variants: Joi.array().items(variant).min(1).max(MAX_VARIANTS).unique('variantId'),
 }).min(1);
 
+const renderUpload = Joi.object({
+  variantId: id.required(),
+});
+
 module.exports.updateProject = updateProject;
+module.exports.renderUpload = renderUpload;
 module.exports.LIMITS = {
   MAX_VARIANTS,
   MAX_REGIONS,

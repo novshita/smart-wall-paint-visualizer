@@ -17,6 +17,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ProjectService } from '../../core/projects/project.service';
 import { EditorStore } from '../../core/editor/editor.store';
 import { ColorCache } from '../../core/editor/color-cache.service';
+import { PatternService } from '../../core/editor/pattern.service';
 import { ApiError } from '../../shared/models/api-error.model';
 
 /**
@@ -34,7 +35,7 @@ import { ApiError } from '../../shared/models/api-error.model';
     MatProgressSpinnerModule,
     MatTooltipModule,
   ],
-  providers: [EditorStore, ColorCache],
+  providers: [EditorStore, ColorCache, PatternService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './editor-shell.html',
   styleUrl: './editor-shell.scss',

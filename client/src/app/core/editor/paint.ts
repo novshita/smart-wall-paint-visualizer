@@ -74,9 +74,17 @@ export function finishCurve(s: number, finish: Finish): number {
   }
 }
 
+export type Rgb = readonly [number, number, number];
+
 export interface PaintParams {
-  /** Target paint colour, sRGB 0–255 */
-  rgb: readonly [number, number, number];
+  /** Target paint colour, sRGB 0–255 (top/left tone for dual-tone, background for patterns) */
+  rgb: Rgb;
+  /** Second colour: bottom/right tone for dual-tone, ink colour for patterns */
+  secondaryRgb?: Rgb;
+  /** Dual-tone split; position is 0–100 across the wall's own extent (FR-C2) */
+  split?: { direction: 'horizontal' | 'vertical'; position: number };
+  /** Pattern coverage per image pixel: 0 = background colour … 255 = ink colour (FR-C3) */
+  pattern?: Uint8Array;
   /** 0–100 */
   opacity: number;
   /** -100 to 100 */
@@ -98,10 +106,24 @@ export function paintRegion(
   bounds: Bounds,
   meanLum: number,
   params: PaintParams,
+  /** The wall's unfeathered extent, used to place the dual-tone split */
+  extent: Bounds = bounds,
 ): void {
   const tr = SRGB_TO_LINEAR[params.rgb[0]];
   const tg = SRGB_TO_LINEAR[params.rgb[1]];
   const tb = SRGB_TO_LINEAR[params.rgb[2]];
+  const second = params.secondaryRgb ?? params.rgb;
+  const sr = SRGB_TO_LINEAR[second[0]];
+  const sg = SRGB_TO_LINEAR[second[1]];
+  const sb = SRGB_TO_LINEAR[second[2]];
+  const pattern = params.pattern;
+  const split = !pattern && params.secondaryRgb ? params.split : undefined;
+  const horizontal = split?.direction !== 'vertical';
+  const splitAt = split
+    ? horizontal
+      ? extent.y0 + ((extent.y1 - extent.y0) * split.position) / 100
+      : extent.x0 + ((extent.x1 - extent.x0) * split.position) / 100
+    : 0;
   const exposure = 2 ** (params.brightness / 100); // ±1 stop at the slider ends
   const opacity = Math.min(1, Math.max(0, params.opacity / 100));
   const inv = 1 / Math.max(meanLum, 0.02); // guard very dark photos against noise blow-up
@@ -119,9 +141,21 @@ export function paintRegion(
       const f = curve[s];
       const mix = (a / 255) * opacity;
       const j = i * 4;
-      out[j] += (linearToSrgb(tr * f) - out[j]) * mix;
-      out[j + 1] += (linearToSrgb(tg * f) - out[j + 1]) * mix;
-      out[j + 2] += (linearToSrgb(tb * f) - out[j + 2]) * mix;
+
+      // How much of the second colour this pixel gets (0 = all primary)
+      let k = 0;
+      if (pattern) k = pattern[i] / 255;
+      else if (split) {
+        // 1 px anti-aliased edge, like a taped paint line
+        k = Math.min(1, Math.max(0, (horizontal ? y : x) + 0.5 - splitAt));
+      }
+      const r = k ? tr + (sr - tr) * k : tr;
+      const g = k ? tg + (sg - tg) * k : tg;
+      const b = k ? tb + (sb - tb) * k : tb;
+
+      out[j] += (linearToSrgb(r * f) - out[j]) * mix;
+      out[j + 1] += (linearToSrgb(g * f) - out[j + 1]) * mix;
+      out[j + 2] += (linearToSrgb(b * f) - out[j + 2]) * mix;
     }
   }
 }

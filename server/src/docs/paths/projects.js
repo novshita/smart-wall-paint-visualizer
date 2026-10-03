@@ -41,6 +41,10 @@ module.exports = {
               variantId: { type: 'string' },
               name: { type: 'string' },
               regions: { type: 'array', items: { type: 'object' } },
+              renderUrl: {
+                type: 'string',
+                description: 'Signed URL of the latest rendered preview',
+              },
             },
           },
         },
@@ -179,6 +183,68 @@ module.exports = {
           204: { description: 'Deleted' },
           404: errorResponse('Not found or not yours'),
         },
+      },
+    },
+    '/projects/{id}/render': {
+      post: {
+        tags: ['Projects'],
+        summary: 'Upload a rendered preview of one design variant (owner only)',
+        description:
+          'Stored as a small JPEG and returned as `variants[].renderUrl` for thumbnails.',
+        security: auth,
+        parameters: [idParam],
+        requestBody: {
+          required: true,
+          content: {
+            'multipart/form-data': {
+              schema: {
+                type: 'object',
+                required: ['image', 'variantId'],
+                properties: {
+                  image: { type: 'string', format: 'binary' },
+                  variantId: { type: 'string' },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: json({ type: 'object', properties: { project: ref('Project') } }),
+          400: errorResponse('Not an image'),
+          404: errorResponse('Project or variant not found'),
+        },
+      },
+    },
+    '/projects/{id}/duplicate': {
+      post: {
+        tags: ['Projects'],
+        summary: 'Duplicate a project, including copies of its images (owner only)',
+        security: auth,
+        parameters: [idParam],
+        responses: {
+          201: json({ type: 'object', properties: { project: ref('Project') } }, 'Created'),
+          404: errorResponse('Not found or not yours'),
+        },
+      },
+    },
+    '/activity': {
+      post: {
+        tags: ['System'],
+        summary: 'Record a client event (download, session start/end)',
+        security: auth,
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              example: {
+                action: 'download',
+                projectId: '<project id>',
+                metadata: { format: 'png' },
+              },
+            },
+          },
+        },
+        responses: { 204: { description: 'Recorded' }, 400: errorResponse('Unknown action') },
       },
     },
     '/files/{key}': {

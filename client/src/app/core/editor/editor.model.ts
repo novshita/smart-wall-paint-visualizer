@@ -24,6 +24,8 @@ export interface RegionStyle {
   colorId?: string;
   secondaryColorId?: string;
   customHex?: string;
+  /** Second colour (dual-tone bottom/right, or pattern ink) when not from the library */
+  secondaryCustomHex?: string;
   patternId?: string;
   split?: { direction?: 'horizontal' | 'vertical'; position?: number };
   opacity?: number;

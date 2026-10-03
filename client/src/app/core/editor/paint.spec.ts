@@ -172,3 +172,46 @@ describe('PaintEngine', () => {
     expect(ms).toBeLessThan(300);
   });
 });
+
+describe('dual-tone and patterns', () => {
+  const WHITE: [number, number, number] = [255, 255, 255];
+  const NAVY: [number, number, number] = [34, 52, 74];
+
+  function paintColumn(params: Partial<Parameters<typeof paintRegion>[6]>, h = 10) {
+    const base = grey(new Array(h).fill(200));
+    const lum = luminanceMap(base);
+    const out = new Uint8ClampedArray(base);
+    const alpha = new Uint8ClampedArray(h).fill(255);
+    const bounds = { x0: 0, y0: 0, x1: 1, y1: h };
+    paintRegion(out, lum, alpha, 1, bounds, lum[0], {
+      rgb: WHITE,
+      opacity: 100,
+      brightness: 0,
+      finish: 'matte',
+      ...params,
+    });
+    return (row: number) => out[row * 4 + 2]; // blue channel separates white from navy clearly
+  }
+
+  it('splits a wall horizontally at the chosen position', () => {
+    const b = paintColumn({ secondaryRgb: NAVY, split: { direction: 'horizontal', position: 40 } });
+    expect(b(0)).toBe(255); // top: first colour
+    expect(b(3)).toBe(255);
+    expect(b(5)).toBeLessThan(100); // below 40%: second colour
+    expect(b(9)).toBeLessThan(100);
+  });
+
+  it('ignores the split when there is no second colour', () => {
+    const b = paintColumn({ split: { direction: 'horizontal', position: 40 } });
+    expect(b(9)).toBe(255);
+  });
+
+  it('mixes background and ink colours by pattern coverage', () => {
+    const pattern = new Uint8Array([0, 255, 128, 0, 0, 0, 0, 0, 0, 0]);
+    const b = paintColumn({ secondaryRgb: NAVY, pattern });
+    expect(b(0)).toBe(255); // background
+    expect(b(1)).toBeLessThan(100); // full ink
+    expect(b(2)).toBeGreaterThan(b(1)); // half coverage sits between
+    expect(b(2)).toBeLessThan(b(0));
+  });
+});

@@ -70,9 +70,30 @@
   flex: 1;
 }
 
+.compare-with {
+  width: 180px;
+  min-height: 36px;
+  padding: 0 var(--swpv-space-2);
+  border: 1px solid var(--swpv-border);
+  border-radius: var(--swpv-radius-sm);
+  font-size: 0.85rem;
+}
+
 .zoom {
   display: flex;
   align-items: center;
+
+  &.floating {
+    position: absolute;
+    right: var(--swpv-space-3);
+    bottom: var(--swpv-space-3);
+    z-index: 1;
+    padding: 2px;
+    border: 1px solid var(--swpv-border);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 94%);
+    box-shadow: var(--swpv-shadow);
+  }
 
   .pct {
     min-width: 48px;

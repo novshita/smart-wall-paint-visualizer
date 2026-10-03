@@ -135,3 +135,46 @@ describe('EditorStore', () => {
     expect(store.activeRegionId()).toBe(b);
   });
 });
+
+describe('EditorStore variants', () => {
+  let store: EditorStore;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [EditorStore, provideHttpClient(), provideHttpClientTesting()],
+    });
+    store = TestBed.inject(EditorStore);
+    store.load({ ...project(), variants: [{ variantId: 'v1', name: 'Design 1', regions: [] }] });
+  });
+
+  it('adds a variant copying the current colours, and switches to it', () => {
+    const wall = store.addWall();
+    store.setStyle(wall, { customHex: '#FF0000' });
+    const id = store.addVariant()!;
+    expect(store.variant()?.variantId).toBe(id);
+    expect(store.variant()?.name).toBe('Design 2');
+    expect(store.regions()[0].style.customHex).toBe('#FF0000');
+
+    store.setStyle(wall, { customHex: '#0000FF' });
+    store.selectVariant('v1');
+    expect(store.regions()[0].style.customHex).toBe('#FF0000'); // independent colours
+  });
+
+  it('renames and deletes variants but always keeps one', () => {
+    const id = store.addVariant()!;
+    store.renameVariant(id, '  Bold option ');
+    expect(store.variant()?.name).toBe('Bold option');
+    store.deleteVariant(id);
+    expect(store.variants().map((v) => v.variantId)).toEqual(['v1']);
+    expect(store.variant()?.variantId).toBe('v1');
+    store.deleteVariant('v1');
+    expect(store.variants()).toHaveLength(1);
+  });
+
+  it('undoes adding a variant', () => {
+    store.addVariant();
+    store.undo();
+    expect(store.variants()).toHaveLength(1);
+    expect(store.variant()?.variantId).toBe('v1');
+  });
+});

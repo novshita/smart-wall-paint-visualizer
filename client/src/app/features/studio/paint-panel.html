@@ -1,17 +1,140 @@
-<section class="current" aria-labelledby="paint-heading">
+<section aria-labelledby="paint-heading">
   <h2 id="paint-heading">Paint “{{ region().name }}”</h2>
-  @if (hex(); as h) {
-    <div class="applied" [style.background]="h" [style.color]="textColor()">
-      @if (color(); as c) {
-        <strong>{{ c.name }}</strong>
-        <span>{{ c.code }} · {{ c.brand }}</span>
-      } @else {
-        <strong>Custom colour</strong>
-      }
-      <span class="hex">{{ h }}</span>
-    </div>
+
+  <mat-button-toggle-group
+    hideSingleSelectionIndicator
+    class="modes"
+    aria-label="Paint style"
+    [value]="mode()"
+    (change)="setMode($event.value)"
+    [disabled]="!isPainted()"
+    [matTooltip]="isPainted() ? '' : 'Choose a colour first'"
+  >
+    @for (m of modes; track m.id) {
+      <mat-button-toggle [value]="m.id">
+        <mat-icon>{{ m.icon }}</mat-icon>
+        {{ m.label }}
+      </mat-button-toggle>
+    }
+  </mat-button-toggle-group>
+
+  @if (mode() === 'solid') {
+    @if (primary().hex; as h) {
+      <div class="applied" [style.background]="h" [style.color]="textOn(h)">
+        <strong>{{ primary().name }}</strong>
+        @if (primary().meta) {
+          <span>{{ primary().meta }}</span>
+        }
+        <span class="hex">{{ h }}</span>
+      </div>
+    } @else {
+      <p class="muted pick">Choose a colour below to paint this wall.</p>
+    }
   } @else {
-    <p class="muted pick">Choose a colour below to paint this wall.</p>
+    <div class="slots" role="radiogroup" aria-label="Colour to change">
+      @for (s of ['primary', 'secondary']; track s; let i = $index) {
+        @let info = s === 'primary' ? primary() : secondary();
+        <button
+          type="button"
+          class="slot"
+          role="radio"
+          [class.on]="slot() === s"
+          [attr.aria-checked]="slot() === s"
+          (click)="slot.set($any(s))"
+        >
+          <span class="slot-swatch" [style.background]="info.hex ?? null" aria-hidden="true"></span>
+          <span class="slot-text">
+            <span class="slot-label">{{ slotLabels()[i] }}</span>
+            <span class="slot-name">{{ info.name }}</span>
+            @if (info.meta) {
+              <span class="slot-meta">{{ info.meta }}</span>
+            }
+          </span>
+        </button>
+      }
+    </div>
+    <p class="muted small">
+      Pick a colour below to change the
+      {{ (slot() === 'primary' ? slotLabels()[0] : slotLabels()[1]).toLowerCase() }} colour.
+    </p>
+  }
+
+  @if (mode() === 'dual') {
+    <div class="options">
+      <span class="field-label" id="split-dir">Split</span>
+      <mat-button-toggle-group
+        hideSingleSelectionIndicator
+        class="full"
+        aria-labelledby="split-dir"
+        [value]="style().split?.direction ?? 'horizontal'"
+        (change)="setSplit({ direction: $event.value })"
+      >
+        <mat-button-toggle value="horizontal"
+          ><mat-icon>horizontal_split</mat-icon> Top / bottom</mat-button-toggle
+        >
+        <mat-button-toggle value="vertical"
+          ><mat-icon>vertical_split</mat-icon> Left / right</mat-button-toggle
+        >
+      </mat-button-toggle-group>
+      <label class="field-label" for="split-pos"
+        >Split position · {{ style().split?.position ?? 50 }}%</label
+      >
+      <mat-slider min="5" max="95" step="1" class="slider">
+        <input
+          id="split-pos"
+          matSliderThumb
+          [value]="style().split?.position ?? 50"
+          (input)="setSplit({ position: +$any($event.target).value }, false)"
+          (change)="setSplit({ position: +$any($event.target).value }, true)"
+        />
+      </mat-slider>
+    </div>
+  }
+
+  @if (mode() === 'pattern') {
+    <div class="options">
+      <span class="field-label">Pattern</span>
+      @if (patterns.patterns().length) {
+        <ul class="patterns">
+          @for (p of patterns.patterns(); track p._id) {
+            <li>
+              <button
+                type="button"
+                class="pattern"
+                [class.current]="style().patternId === p._id"
+                [attr.aria-pressed]="style().patternId === p._id"
+                [attr.aria-label]="p.name"
+                [matTooltip]="p.name + ' · ' + p.category"
+                (click)="setPattern(p)"
+                [style.background-image]="'url(' + assetUrl(p.imageUrl) + ')'"
+              ></button>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="muted small">Loading patterns…</p>
+      }
+      <label class="field-label" for="p-scale">Size · {{ style().patternScale ?? 1 }}×</label>
+      <mat-slider min="0.5" max="4" step="0.1" class="slider">
+        <input
+          id="p-scale"
+          matSliderThumb
+          [value]="style().patternScale ?? 1"
+          (input)="adjust('patternScale', +$any($event.target).value, false)"
+          (change)="adjust('patternScale', +$any($event.target).value, true)"
+        />
+      </mat-slider>
+      <label class="field-label" for="p-rot">Rotation · {{ style().patternRotation ?? 0 }}°</label>
+      <mat-slider min="-90" max="90" step="5" class="slider">
+        <input
+          id="p-rot"
+          matSliderThumb
+          [value]="style().patternRotation ?? 0"
+          (input)="adjust('patternRotation', +$any($event.target).value, false)"
+          (change)="adjust('patternRotation', +$any($event.target).value, true)"
+        />
+      </mat-slider>
+    </div>
   }
 </section>
 
@@ -143,11 +266,12 @@
   }
 </ng-template>
 
-@if (hex()) {
+@if (isPainted()) {
   <section class="adjust" aria-label="Adjustments">
     <span class="field-label" id="finish-label">Finish</span>
     <mat-button-toggle-group
-      class="finish"
+      hideSingleSelectionIndicator
+      class="full"
       aria-labelledby="finish-label"
       [value]="finish()"
       (change)="setFinish($event.value)"

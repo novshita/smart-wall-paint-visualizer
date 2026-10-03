@@ -55,7 +55,11 @@ function createApp() {
   app.use(
     '/static',
     helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }),
-    express.static(path.join(__dirname, '../public'), { maxAge: '7d', index: false }),
+    express.static(path.join(__dirname, '../public'), {
+      maxAge: '7d',
+      index: false,
+      setHeaders: (res) => res.setHeader('Access-Control-Allow-Origin', '*'),
+    }),
   );
 
   app.use('/api/v1', apiLimiter, routes);

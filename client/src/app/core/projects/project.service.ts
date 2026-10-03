@@ -53,6 +53,38 @@ export class ProjectService {
     });
   }
 
+  rename(id: string, title: string): Observable<Project> {
+    return this.http
+      .put<{ project: Project }>(`${this.api}/${encodeURIComponent(id)}`, { title })
+      .pipe(map((r) => r.project));
+  }
+
+  duplicate(id: string): Observable<Project> {
+    return this.http
+      .post<{ project: Project }>(`${this.api}/${encodeURIComponent(id)}/duplicate`, {})
+      .pipe(map((r) => r.project));
+  }
+
+  /** Stores a small rendered preview of a design variant (used as its thumbnail). */
+  uploadRender(id: string, variantId: string, image: Blob): Observable<Project> {
+    const body = new FormData();
+    body.append('variantId', variantId);
+    body.append('image', image, 'render.jpg');
+    return this.http
+      .post<{ project: Project }>(`${this.api}/${encodeURIComponent(id)}/render`, body)
+      .pipe(map((r) => r.project));
+  }
+
+  /** Records a client-side event such as a download (spec §10.6). */
+  logActivity(event: {
+    action: 'download' | 'session_start' | 'session_end';
+    projectId?: string;
+    sessionId?: string;
+    metadata?: Record<string, unknown>;
+  }): Observable<void> {
+    return this.http.post<void>(`${environment.apiUrl}/activity`, event);
+  }
+
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.api}/${encodeURIComponent(id)}`);
   }
