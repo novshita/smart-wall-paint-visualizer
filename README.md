@@ -10,7 +10,7 @@
 
 **Smart Wall Paint Visualizer** is a web app built on the **MEAN stack** (MongoDB, Express, Angular, Node.js). Upload a photo of your room, select the walls, try different colours and designs, and compare the before and after, all in your browser.
 
-🔗 **Live demo:** _add your deployed URL here_ (see the [deployment guide](docs/deployment.md))
+🧪 **Try it locally:** follow [Getting Started](#-getting-started) below (about 10 minutes with Docker).
 
 ---
 

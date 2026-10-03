@@ -580,7 +580,7 @@
       </table>
       <p>
         Environment configuration is kept in environment variables, never in code. A step-by-step guide is in
-        <code>docs/deployment.md</code>. The live deployment link is provided with this submission.
+        <code>docs/deployment.md</code>. The project is fully prepared for deployment (Docker image, hosting configuration and CI/CD pipeline); a public live instance was not set up for this submission, so the application is demonstrated by running it locally (see the appendix).
       </p>
     </section>
 
@@ -616,7 +616,7 @@
           <tr><td>Unauthorised access to others' projects and admin routes is blocked</td><td class="ok">Met (API and end-to-end tests)</td></tr>
           <tr><td>At least 6–7 interconnected pages integrated with backend and database</td><td class="ok">Met (11 pages)</td></tr>
           <tr><td>Recolour under 300 ms for a 2000 px image</td><td class="ok">Met (~15 ms)</td></tr>
-          <tr><td>Live on a cloud environment with HTTPS</td><td class="ok">Deployment link provided with this submission</td></tr>
+          <tr><td>Live on a cloud environment with HTTPS</td><td class="partial">Deployment-ready (Docker, hosting configuration, CI/CD and guide); not hosted live</td></tr>
         </tbody>
       </table>
     </section>
@@ -670,7 +670,7 @@
       </div>
       <h2>Accounts and documentation</h2>
       <ul>
-        <li><strong>Local admin account</strong> (created by the seed): <code>admin@swpv.local</code> / <code>ChangeMe123!</code>. For the live site, admin credentials are provided separately.</li>
+        <li><strong>Local admin account</strong> (created by the seed): <code>admin@swpv.local</code> / <code>ChangeMe123!</code>.</li>
         <li><strong>API documentation:</strong> <code>http://localhost:5050/api/docs</code></li>
         <li><strong>Tests:</strong> <code>npm test</code> in <code>server</code>; <code>npx ng test</code> in <code>client</code>; <code>npx playwright test</code> in <code>e2e</code>.</li>
         <li><strong>Specification:</strong> <code>docs/spec.md</code> · <strong>Deployment guide:</strong> <code>docs/deployment.md</code></li>
