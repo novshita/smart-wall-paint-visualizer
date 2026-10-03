@@ -13,7 +13,7 @@ import { Variant } from '../../shared/models/project.model';
   imports: [MatButtonModule, MatIconModule, MatMenuModule, MatTooltipModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="bar" role="tablist" aria-label="Design variants">
+    <div class="bar" role="group" aria-label="Design variants">
       @for (v of store.variants(); track v.variantId) {
         @let active = v.variantId === store.variant()?.variantId;
         @if (editingId() === v.variantId) {
@@ -30,10 +30,9 @@ import { Variant } from '../../shared/models/project.model';
         } @else {
           <button
             type="button"
-            role="tab"
             class="variant"
             [class.on]="active"
-            [attr.aria-selected]="active"
+            [attr.aria-pressed]="active"
             (click)="store.selectVariant(v.variantId)"
             (dblclick)="startRename(v)"
           >

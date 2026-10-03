@@ -23,6 +23,9 @@
     }
     <a mat-button routerLink="/colors" routerLinkActive="active">Colours</a>
     <a mat-button routerLink="/help" routerLinkActive="active">How to use</a>
+    @if (auth.isAdmin()) {
+      <a mat-button routerLink="/admin" routerLinkActive="active">Admin</a>
+    }
   </nav>
 
   <span class="spacer"></span>
@@ -52,6 +55,12 @@
         <mat-icon>photo_library</mat-icon>
         <span>My designs</span>
       </a>
+      @if (auth.isAdmin()) {
+        <a mat-menu-item routerLink="/admin">
+          <mat-icon>admin_panel_settings</mat-icon>
+          <span>Admin panel</span>
+        </a>
+      }
       <a mat-menu-item routerLink="/profile">
         <mat-icon>person</mat-icon>
         <span>Profile</span>

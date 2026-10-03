@@ -1,0 +1,44 @@
+# Render Blueprint for the API (https://render.com/docs/blueprint-spec)
+# Create it from the Render dashboard: New → Blueprint → pick this repository.
+services:
+  - type: web
+    name: swpv-api
+    runtime: docker
+    rootDir: server
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    healthCheckPath: /api/v1/health
+    autoDeploy: false # deployed by GitHub Actions after tests pass
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5050
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FILE_URL_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 1h
+      - key: CLIENT_URL
+        sync: false # e.g. https://wallvisualizer.example.com
+      - key: MAX_UPLOAD_MB
+        value: 10
+      - key: STORAGE_DRIVER
+        value: s3
+      - key: AWS_S3_BUCKET
+        sync: false
+      - key: AWS_REGION
+        sync: false
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: PUBLIC_ASSET_BASE_URL
+        sync: false # optional CDN in front of the bucket's public/ prefix
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false

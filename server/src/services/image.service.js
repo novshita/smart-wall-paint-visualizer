@@ -110,4 +110,33 @@ async function processRender(buffer) {
   }
 }
 
-module.exports = { processUpload, processRender, detectFormat, MIN_SIDE, WORKING_MAX, THUMB_MAX };
+/** Admin-uploaded pattern tile → greyscale PNG (the studio tints it), max 512 px. */
+async function processPatternTile(buffer) {
+  // SVG is deliberately not accepted: it can carry scripts
+  if (!detectFormat(buffer)) throw ApiError.badRequest('Pattern tiles must be PNG or JPG images.');
+  try {
+    const { data, info } = await sharp(buffer, { limitInputPixels: MAX_PIXELS, failOn: 'error' })
+      .resize({ width: 512, height: 512, fit: 'inside', withoutEnlargement: true })
+      .flatten({ background: '#ffffff' })
+      .greyscale()
+      .toColourspace('b-w')
+      .png({ compressionLevel: 9 })
+      .toBuffer({ resolveWithObject: true });
+    if (Math.min(info.width, info.height) < 8)
+      throw ApiError.badRequest('Pattern tile is too small.');
+    return { buffer: data, width: info.width, height: info.height };
+  } catch (err) {
+    if (err instanceof ApiError) throw err;
+    throw ApiError.badRequest('Pattern tile is not a valid image.');
+  }
+}
+
+module.exports = {
+  processUpload,
+  processRender,
+  processPatternTile,
+  detectFormat,
+  MIN_SIDE,
+  WORKING_MAX,
+  THUMB_MAX,
+};

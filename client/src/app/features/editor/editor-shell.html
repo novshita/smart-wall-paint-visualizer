@@ -42,6 +42,16 @@
 
     <span class="spacer"></span>
 
+    <button
+      mat-icon-button
+      type="button"
+      (click)="openGuide()"
+      aria-label="How the editor works"
+      matTooltip="How it works"
+    >
+      <mat-icon>help</mat-icon>
+    </button>
+
     <span class="save {{ store.saveState() }}" role="status" aria-live="polite">
       @switch (store.saveState()) {
         @case ('saving') {

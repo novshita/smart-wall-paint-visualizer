@@ -1,0 +1,146 @@
+<header class="head">
+  <div>
+    <h1>Dashboard</h1>
+    <p class="muted">
+      How people are using the visualiser.
+      @if (analytics(); as a) {
+        Updated {{ a.generatedAt | date: 'shortTime' }} · refreshes every 30 seconds.
+      }
+    </p>
+  </div>
+</header>
+
+<div class="filters">
+  <mat-button-toggle-group
+    hideSingleSelectionIndicator
+    aria-label="Date range"
+    [value]="days()"
+    (change)="days.set($event.value)"
+  >
+    <mat-button-toggle [value]="7">Last 7 days</mat-button-toggle>
+    <mat-button-toggle [value]="30">Last 30 days</mat-button-toggle>
+    <mat-button-toggle [value]="90">Last 90 days</mat-button-toggle>
+  </mat-button-toggle-group>
+  <button mat-icon-button type="button" (click)="data.reload()" aria-label="Refresh now">
+    <mat-icon>refresh</mat-icon>
+  </button>
+</div>
+
+@if (data.error() && !analytics()) {
+  <div class="state" role="alert">
+    <p>We couldn't load the analytics.</p>
+    <button mat-stroked-button type="button" (click)="data.reload()">Retry</button>
+  </div>
+} @else if (analytics(); as a) {
+  <div class="body" [class.dim]="data.isLoading()">
+    <section class="kpis" aria-label="Key figures">
+      <article class="tile">
+        <h2>Room photos uploaded</h2>
+        <p class="value">{{ a.kpis.uploads | number }}</p>
+        @if (spark('uploads'); as s) {
+          <svg class="spark" viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true">
+            <polyline [attr.points]="s.line" />
+            <circle [attr.cx]="s.last[0]" [attr.cy]="s.last[1]" r="2.5" />
+          </svg>
+        }
+      </article>
+      <article class="tile">
+        <h2>Designs saved</h2>
+        <p class="value">{{ a.kpis.designsSaved | number }}</p>
+        <p class="sub">{{ a.kpis.totalSavedDesigns | number }} saved designs in total</p>
+      </article>
+      <article class="tile">
+        <h2>Average session</h2>
+        <p class="value">{{ duration(a.kpis.avgSessionSeconds) }}</p>
+        <p class="sub">across {{ a.kpis.sessions | number }} sessions</p>
+      </article>
+      <article class="tile">
+        <h2>User satisfaction</h2>
+        @if (a.kpis.satisfaction.average !== null) {
+          <p class="value">{{ a.kpis.satisfaction.average }} <span class="unit">/ 5</span></p>
+          <p class="sub">from {{ a.kpis.satisfaction.responses | number }} ratings</p>
+        } @else {
+          <p class="value">—</p>
+          <p class="sub">No ratings in this period</p>
+        }
+      </article>
+    </section>
+
+    <p class="people muted">
+      <mat-icon aria-hidden="true">group</mat-icon>
+      {{ a.kpis.totalUsers | number }} registered users · {{ a.kpis.activeUsers | number }} active
+      in this period
+    </p>
+
+    <section class="card" aria-labelledby="trend-heading">
+      <div class="card-head">
+        <h2 id="trend-heading">Activity per day</h2>
+        <button
+          mat-button
+          type="button"
+          (click)="showTable.set(!showTable())"
+          [attr.aria-pressed]="showTable()"
+        >
+          <mat-icon>{{ showTable() ? 'show_chart' : 'table_rows' }}</mat-icon>
+          {{ showTable() ? 'Show chart' : 'Show table' }}
+        </button>
+      </div>
+      @if (showTable()) {
+        <div class="table-wrap">
+          <table>
+            <caption class="visually-hidden">
+              Uploads, saves and downloads per day
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Uploads</th>
+                <th scope="col">Saves</th>
+                <th scope="col">Downloads</th>
+                <th scope="col">Sign-ups</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of a.series; track p.date) {
+                <tr>
+                  <th scope="row">{{ p.date | date: 'mediumDate' : 'UTC' }}</th>
+                  <td>{{ p.uploads }}</td>
+                  <td>{{ p.saves }}</td>
+                  <td>{{ p.downloads }}</td>
+                  <td>{{ p.signups }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <app-trend-chart
+          [points]="a.series"
+          [series]="series"
+          label="Uploads, saves and downloads per day"
+        />
+      }
+    </section>
+
+    <div class="pair">
+      <section class="card" aria-labelledby="ratings-heading">
+        <h2 id="ratings-heading">Satisfaction ratings</h2>
+        <app-bar-list
+          [items]="ratings()"
+          label="Number of ratings by stars"
+          emptyText="No ratings in this period yet. Users are asked after they download a design."
+        />
+      </section>
+      <section class="card" aria-labelledby="colors-heading">
+        <h2 id="colors-heading">Most used colours</h2>
+        <app-bar-list
+          [items]="topColors()"
+          label="Walls painted with each colour"
+          emptyText="No designs with library colours in this period"
+        />
+      </section>
+    </div>
+  </div>
+} @else {
+  <p class="muted">Loading analytics…</p>
+}

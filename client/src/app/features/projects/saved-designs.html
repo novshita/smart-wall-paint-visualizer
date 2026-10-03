@@ -36,10 +36,10 @@
     @let result = list.value();
     @if (result.items.length) {
       <ul class="grid">
-        @for (p of result.items; track p._id) {
+        @for (p of result.items; track p._id; let i = $index) {
           <li class="card">
             <a class="thumb" [routerLink]="openLink(p)" [attr.aria-label]="'Open ' + p.title">
-              <img [src]="thumbnail(p)" alt="" loading="lazy" />
+              <img [src]="thumbnail(p)" alt="" [attr.loading]="i < 4 ? 'eager' : 'lazy'" />
               <span class="status {{ p.status }}">{{
                 p.status === 'saved' ? 'Saved' : 'Draft'
               }}</span>

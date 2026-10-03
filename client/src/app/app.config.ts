@@ -12,6 +12,7 @@ import { routes } from './app.routes';
 import { errorInterceptor } from './core/http/error.interceptor';
 import { authInterceptor } from './core/auth/auth.interceptor';
 import { AuthService } from './core/auth/auth.service';
+import { SessionTracker } from './core/analytics/session-tracker.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -26,6 +27,10 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
     // Restore the session before the first route is resolved, so guards see the user
     provideAppInitializer(() => inject(AuthService).init()),
+    // Starts session tracking for the average-session KPI
+    provideAppInitializer(() => {
+      inject(SessionTracker);
+    }),
     // Use the Material Symbols font loaded in index.html for <mat-icon>
     provideAppInitializer(() => {
       inject(MatIconRegistry).setDefaultFontSetClass('material-symbols-outlined');

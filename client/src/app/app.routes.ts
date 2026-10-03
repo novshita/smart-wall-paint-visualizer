@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { Shell } from './core/layout/shell';
-import { authGuard, guestGuard } from './core/auth/auth.guards';
+import { adminGuard, authGuard, guestGuard } from './core/auth/auth.guards';
 import { editorLeaveGuard } from './features/editor/editor-leave.guard';
 
 // Every feature is lazy-loaded. Remaining pages from spec §5 are added as each feature is built.
@@ -97,6 +97,54 @@ export const routes: Routes = [
             title: 'Colour · Wall Visualizer',
             loadComponent: () =>
               import('./features/colors/color-detail').then((m) => m.ColorDetail),
+          },
+        ],
+      },
+      {
+        path: 'admin',
+        canActivate: [adminGuard],
+        loadComponent: () => import('./features/admin/admin-shell').then((m) => m.AdminShell),
+        children: [
+          {
+            path: '',
+            pathMatch: 'full',
+            title: 'Admin dashboard · Wall Visualizer',
+            loadComponent: () =>
+              import('./features/admin/admin-dashboard').then((m) => m.AdminDashboard),
+          },
+          {
+            path: 'colors',
+            title: 'Colours · Admin',
+            loadComponent: () => import('./features/admin/admin-colors').then((m) => m.AdminColors),
+          },
+          {
+            path: 'patterns',
+            title: 'Patterns · Admin',
+            loadComponent: () =>
+              import('./features/admin/admin-patterns').then((m) => m.AdminPatterns),
+          },
+          {
+            path: 'users',
+            title: 'Users · Admin',
+            loadComponent: () => import('./features/admin/admin-users').then((m) => m.AdminUsers),
+          },
+          {
+            path: 'designs',
+            title: 'Designs · Admin',
+            loadComponent: () =>
+              import('./features/admin/admin-designs').then((m) => m.AdminDesigns),
+          },
+          {
+            path: 'activity',
+            title: 'Activity · Admin',
+            loadComponent: () =>
+              import('./features/admin/admin-activity').then((m) => m.AdminActivity),
+          },
+          {
+            path: 'settings',
+            title: 'Settings · Admin',
+            loadComponent: () =>
+              import('./features/admin/admin-settings').then((m) => m.AdminSettings),
           },
         ],
       },

@@ -1,0 +1,118 @@
+<article class="page help">
+  <h1>How to use</h1>
+  <p class="lead muted">
+    Preview paint on a photo of your own room in four steps. It takes about five minutes the first
+    time.
+  </p>
+
+  <ol class="steps">
+    <li>
+      <mat-icon aria-hidden="true">add_photo_alternate</mat-icon>
+      <div>
+        <h2>1. Upload a photo</h2>
+        <p>
+          From your <a routerLink="/dashboard">dashboard</a>, choose
+          <strong>Upload a photo</strong>. Use a JPG or PNG of a room you own or have permission to
+          use. Location and camera details are removed when it's saved, and only you can see it.
+        </p>
+      </div>
+    </li>
+    <li>
+      <mat-icon aria-hidden="true">polyline</mat-icon>
+      <div>
+        <h2>2. Select the walls</h2>
+        <p>
+          Use the <strong>polygon</strong> tool to click each corner of a wall, or the
+          <strong>brush</strong> to paint over it. Then use the <strong>eraser</strong> on windows,
+          doors, pictures and furniture. Add one wall per surface you want to colour separately.
+        </p>
+      </div>
+    </li>
+    <li>
+      <mat-icon aria-hidden="true">format_paint</mat-icon>
+      <div>
+        <h2>3. Paint and compare</h2>
+        <p>
+          Pick a wall, then a colour from the library, your favourites, recent colours or your own
+          HEX code. Choose <strong>Solid</strong>, <strong>Two-tone</strong> or
+          <strong>Pattern</strong>, and adjust finish, opacity and brightness. Use
+          <strong>Compare</strong> to slide between before and after, and <strong>+</strong> to try
+          a second idea.
+        </p>
+      </div>
+    </li>
+    <li>
+      <mat-icon aria-hidden="true">download</mat-icon>
+      <div>
+        <h2>4. Save and download</h2>
+        <p>
+          Changes save automatically. Click <strong>Save</strong> to add the design to
+          <a routerLink="/projects">My designs</a>, and <strong>Download</strong> a full-size image
+          or a before-and-after with the colour names and codes.
+        </p>
+      </div>
+    </li>
+  </ol>
+
+  <app-disclaimer />
+
+  <h2 class="section">Tips for realistic results</h2>
+  <ul class="tips">
+    <li>Take photos in even daylight; avoid flash and strong sun patches.</li>
+    <li>Stand back so the whole wall is in view, and hold the camera level.</li>
+    <li>Zoom in when tracing corners; a few extra points make edges much cleaner.</li>
+    <li>Use a little edge softness (2–4 px) where walls meet ceilings.</li>
+    <li>Always check a real sample pot on the wall before buying paint.</li>
+  </ul>
+
+  <h2 class="section">Keyboard shortcuts</h2>
+  <table class="shortcuts">
+    <caption class="visually-hidden">
+      Editor keyboard shortcuts
+    </caption>
+    <tbody>
+      @for (s of shortcuts; track s[0]) {
+        <tr>
+          <th scope="row">
+            <kbd>{{ s[0] }}</kbd>
+          </th>
+          <td>{{ s[1] }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  <h2 class="section">Questions</h2>
+  <mat-accordion>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header
+        >Why does the colour look different from the paint card?</mat-expansion-panel-header
+      >
+      <p>
+        Screens, room lighting and wall texture all change how a colour looks. The preview keeps the
+        light and shadow from your photo, but it is still a guide. Test a sample on your wall before
+        deciding.
+      </p>
+    </mat-expansion-panel>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>Who can see my photos?</mat-expansion-panel-header>
+      <p>
+        Only you. Photos are stored privately and shown through links that expire. Deleting a design
+        deletes its photo permanently.
+      </p>
+    </mat-expansion-panel>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header
+        >Can I change a wall after painting it?</mat-expansion-panel-header
+      >
+      <p>
+        Yes. Go back to <strong>Select walls</strong>: your selections stay editable. Changes to a
+        wall's shape apply to every design variant.
+      </p>
+    </mat-expansion-panel>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>Can I use it on a tablet?</mat-expansion-panel-header>
+      <p>Yes. Pinch to zoom, drag with two fingers to pan, and tap to place polygon points.</p>
+    </mat-expansion-panel>
+  </mat-accordion>
+</article>

@@ -1,0 +1,117 @@
+<ul class="legend" aria-hidden="true">
+  @for (s of series(); track s.key) {
+    <li><span class="key" [style.background]="s.color"></span>{{ s.label }}</li>
+  }
+</ul>
+
+<div class="frame">
+  <svg
+    [attr.width]="width()"
+    [attr.height]="height"
+    [attr.viewBox]="'0 0 ' + width() + ' ' + height"
+    role="img"
+    tabindex="0"
+    [attr.aria-label]="summary()"
+    (pointermove)="onPointer($event)"
+    (pointerdown)="onPointer($event)"
+    (pointerleave)="hover.set(null)"
+    (keydown)="onKey($event)"
+    (blur)="hover.set(null)"
+  >
+    <!-- gridlines + y ticks -->
+    @for (t of ticks(); track t) {
+      <line
+        class="grid"
+        [attr.x1]="m.left"
+        [attr.x2]="m.left + plotW()"
+        [attr.y1]="y(t)"
+        [attr.y2]="y(t)"
+      />
+      <text
+        class="tick"
+        [attr.x]="m.left - 8"
+        [attr.y]="y(t)"
+        text-anchor="end"
+        dominant-baseline="middle"
+      >
+        {{ t | number }}
+      </text>
+    }
+    <line
+      class="axis"
+      [attr.x1]="m.left"
+      [attr.x2]="m.left + plotW()"
+      [attr.y1]="y(0)"
+      [attr.y2]="y(0)"
+    />
+
+    <!-- x ticks -->
+    @for (t of xTicks(); track t.i) {
+      <text class="tick" [attr.x]="x(t.i)" [attr.y]="height - 8" text-anchor="middle">
+        {{ t.date | date: 'MMM d' : 'UTC' }}
+      </text>
+    }
+
+    <!-- lines -->
+    @for (p of paths(); track p.key) {
+      <path class="line" [attr.d]="p.d" [attr.stroke]="p.color" />
+    }
+
+    <!-- end markers + direct labels -->
+    @if (points().length) {
+      @for (s of series(); track s.key) {
+        <circle
+          class="dot"
+          [attr.cx]="x(points().length - 1)"
+          [attr.cy]="y(value(points()[points().length - 1], s.key))"
+          r="4"
+          [attr.fill]="s.color"
+        />
+      }
+      @for (l of endLabels(); track l.key) {
+        <text
+          class="end-label"
+          [attr.x]="x(points().length - 1) + 10"
+          [attr.y]="l.y"
+          dominant-baseline="middle"
+        >
+          <tspan class="end-value">{{ l.value | number }}</tspan>
+          {{ l.label }}
+        </text>
+      }
+    }
+
+    <!-- crosshair -->
+    @if (hover() !== null) {
+      <line
+        class="crosshair"
+        [attr.x1]="x(hover()!)"
+        [attr.x2]="x(hover()!)"
+        [attr.y1]="m.top"
+        [attr.y2]="y(0)"
+      />
+      @for (s of series(); track s.key) {
+        <circle
+          class="dot"
+          [attr.cx]="x(hover()!)"
+          [attr.cy]="y(value(points()[hover()!], s.key))"
+          r="4"
+          [attr.fill]="s.color"
+        />
+      }
+    }
+  </svg>
+
+  @if (hoverPoint(); as p) {
+    <div class="tooltip" [style.left.px]="tooltipLeft()" [style.top.px]="m.top" role="status">
+      <div class="tip-date">{{ p.date | date: 'EEE, MMM d' : 'UTC' }}</div>
+      @for (s of series(); track s.key) {
+        <div class="tip-row">
+          <span class="line-key" [style.background]="s.color"></span>
+          <strong>{{ value(p, s.key) | number }}</strong>
+          <span class="tip-label">{{ s.label }}</span>
+        </div>
+      }
+    </div>
+  }
+</div>

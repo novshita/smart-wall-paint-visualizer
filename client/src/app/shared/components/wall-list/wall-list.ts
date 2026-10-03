@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -15,7 +16,7 @@ export interface WallPaint {
 /** Named walls of the current design (FR-W3): pick, rename, delete, add. */
 @Component({
   selector: 'app-wall-list',
-  imports: [MatButtonModule, MatIconModule, MatTooltipModule],
+  imports: [NgTemplateOutlet, MatButtonModule, MatIconModule, MatTooltipModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './wall-list.html',
   styleUrl: './wall-list.scss',

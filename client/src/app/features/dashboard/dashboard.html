@@ -36,7 +36,7 @@
         @for (p of recent.value().items; track p._id) {
           <li>
             <a class="project" [routerLink]="openLink(p)">
-              <img [src]="thumbnail(p)" alt="" loading="lazy" />
+              <img [src]="thumbnail(p)" alt="" />
               <span class="project-info">
                 <span class="project-title">{{ p.title }}</span>
                 <span class="muted small">Edited {{ p.updatedAt | date: 'mediumDate' }}</span>

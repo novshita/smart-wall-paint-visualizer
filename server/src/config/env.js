@@ -40,9 +40,14 @@ const env = {
   aws: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    sessionToken: process.env.AWS_SESSION_TOKEN,
     bucket: process.env.AWS_S3_BUCKET,
-    region: process.env.AWS_REGION,
+    region: process.env.AWS_REGION || 'us-east-1',
+    // Where public catalogue assets (uploaded pattern tiles) are served from, e.g. a CDN
+    publicBaseUrl: process.env.PUBLIC_ASSET_BASE_URL,
   },
+  // 'local' (disk, development) or 's3' (production); defaults to s3 when a bucket is set
+  storageDriver: process.env.STORAGE_DRIVER || (process.env.AWS_S3_BUCKET ? 's3' : 'local'),
 };
 
 module.exports = env;
