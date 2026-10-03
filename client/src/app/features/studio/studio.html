@@ -1,0 +1,155 @@
+<div class="editor">
+  <aside class="walls">
+    <app-wall-list mode="paint" [paint]="wallPaint()" />
+    <a mat-button routerLink="../select" queryParamsHandling="preserve" class="back">
+      <mat-icon>arrow_back</mat-icon>
+      Edit wall selections
+    </a>
+  </aside>
+
+  <section class="stage" aria-label="Paint preview">
+    <div class="toolbar">
+      <button
+        mat-icon-button
+        type="button"
+        (click)="store.undo()"
+        [disabled]="!store.canUndo()"
+        aria-label="Undo (Ctrl+Z)"
+        matTooltip="Undo (Ctrl+Z)"
+      >
+        <mat-icon>undo</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        type="button"
+        (click)="store.redo()"
+        [disabled]="!store.canRedo()"
+        aria-label="Redo (Ctrl+Shift+Z)"
+        matTooltip="Redo (Ctrl+Shift+Z)"
+      >
+        <mat-icon>redo</mat-icon>
+      </button>
+
+      <span class="divider" aria-hidden="true"></span>
+
+      <button
+        mat-stroked-button
+        type="button"
+        class="toggle"
+        [class.on]="compare()"
+        [attr.aria-pressed]="compare()"
+        (click)="compare.set(!compare())"
+        matTooltip="Before/after slider (\\)"
+        aria-label="Compare before and after"
+      >
+        <mat-icon>compare</mat-icon>
+        <span class="label">Compare</span>
+      </button>
+      <button
+        mat-stroked-button
+        type="button"
+        class="toggle"
+        [class.on]="showBefore()"
+        [attr.aria-pressed]="showBefore()"
+        (pointerdown)="showBefore.set(true)"
+        (pointerup)="showBefore.set(false)"
+        (pointerleave)="showBefore.set(false)"
+        (keydown.space)="showBefore.set(true); $event.preventDefault()"
+        (keyup.space)="showBefore.set(false)"
+        (keydown.enter)="showBefore.set(!showBefore())"
+        matTooltip="Press and hold to see the original photo"
+        aria-label="Hold to see the original photo"
+      >
+        <mat-icon>visibility</mat-icon>
+        <span class="label">Hold for before</span>
+      </button>
+
+      <span class="spacer"></span>
+
+      <div class="zoom">
+        <button
+          mat-icon-button
+          type="button"
+          (click)="canvas().zoomBy(0.8)"
+          aria-label="Zoom out (−)"
+          matTooltip="Zoom out (−)"
+        >
+          <mat-icon>zoom_out</mat-icon>
+        </button>
+        <span class="pct">{{ zoomPercent() | number: '1.0-0' }}%</span>
+        <button
+          mat-icon-button
+          type="button"
+          (click)="canvas().zoomBy(1.25)"
+          aria-label="Zoom in (+)"
+          matTooltip="Zoom in (+)"
+        >
+          <mat-icon>zoom_in</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          type="button"
+          (click)="canvas().fit()"
+          aria-label="Fit to screen (0)"
+          matTooltip="Fit to screen (0)"
+        >
+          <mat-icon>fit_screen</mat-icon>
+        </button>
+      </div>
+
+      @let saveText =
+        store.project()?.status === 'saved' && store.saveState() === 'saved'
+          ? 'Saved'
+          : 'Save design';
+      <button
+        mat-flat-button
+        type="button"
+        (click)="saveDesign()"
+        [disabled]="saving()"
+        matTooltip="Save design (Ctrl+S)"
+        [attr.aria-label]="saveText"
+      >
+        <mat-icon>save</mat-icon>
+        <span class="label">{{ saveText }}</span>
+      </button>
+    </div>
+
+    <div class="canvas-wrap">
+      <app-studio-canvas
+        [layers]="layers()"
+        [compare]="compare()"
+        [(comparePos)]="comparePos"
+        [showBefore]="showBefore()"
+      />
+    </div>
+
+    @if (compare()) {
+      <div class="compare-bar">
+        <label for="compare-pos">Before</label>
+        <mat-slider min="0" max="100" step="1" class="compare-slider">
+          <input
+            id="compare-pos"
+            matSliderThumb
+            aria-label="Before and after divider position"
+            [value]="comparePos() * 100"
+            (valueChange)="comparePos.set($event / 100)"
+          />
+        </mat-slider>
+        <span>After</span>
+      </div>
+    }
+    <div class="disclaimer"><app-disclaimer [compact]="true" /></div>
+  </section>
+
+  <aside class="panel">
+    @if (active(); as wall) {
+      <app-paint-panel [region]="wall" />
+    } @else {
+      <div class="empty">
+        <mat-icon aria-hidden="true">format_paint</mat-icon>
+        <p>Select at least one wall first, then come back to paint it.</p>
+        <a mat-flat-button routerLink="../select">Select walls</a>
+      </div>
+    }
+  </aside>
+</div>

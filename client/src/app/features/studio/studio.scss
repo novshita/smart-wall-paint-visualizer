@@ -1,0 +1,173 @@
+@use 'tokens' as *;
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+.editor {
+  display: grid;
+  grid-template-columns: 260px 1fr 340px;
+  height: 100%;
+}
+
+.walls,
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--swpv-space-4);
+  min-height: 0;
+  padding: var(--swpv-space-4);
+  overflow-y: auto;
+  background: #fff;
+}
+
+.walls {
+  border-right: 1px solid var(--swpv-border);
+
+  .back {
+    align-self: flex-start;
+    margin-top: auto;
+  }
+}
+
+.panel {
+  border-left: 1px solid var(--swpv-border);
+}
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--swpv-space-1);
+  min-height: 48px;
+  padding: var(--swpv-space-1) var(--swpv-space-2);
+  border-bottom: 1px solid var(--swpv-border);
+  background: #fff;
+}
+
+.divider {
+  width: 1px;
+  height: 24px;
+  margin: 0 var(--swpv-space-2);
+  background: var(--swpv-border);
+}
+
+.toggle.on {
+  border-color: var(--swpv-brand);
+  background: #e6f1f2;
+  color: var(--swpv-brand-dark);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.zoom {
+  display: flex;
+  align-items: center;
+
+  .pct {
+    min-width: 48px;
+    text-align: center;
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.canvas-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.compare-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--swpv-space-3);
+  padding: 0 var(--swpv-space-4);
+  background: #fff;
+  border-top: 1px solid var(--swpv-border);
+  font-size: 0.85rem;
+
+  .compare-slider {
+    flex: 1;
+  }
+}
+
+.disclaimer {
+  padding: var(--swpv-space-2);
+  background: #fff;
+  border-top: 1px solid var(--swpv-border);
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--swpv-space-3);
+  padding: var(--swpv-space-6) var(--swpv-space-3);
+  text-align: center;
+  color: var(--swpv-muted);
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+// Small laptops and landscape tablets: slimmer panels, icon-only toolbar
+@media (max-width: 1279px) {
+  .editor {
+    grid-template-columns: 200px 1fr 320px;
+  }
+
+  .toolbar .label {
+    display: none;
+  }
+
+  // Icon-only: drop the spacing Material reserves for the hidden text
+  .toolbar .mat-mdc-button-base:has(.label) {
+    min-width: 44px;
+    padding-inline: 10px;
+
+    > .mat-icon {
+      margin: 0;
+    }
+  }
+}
+
+@include tablet-down {
+  .editor {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(360px, 1fr) auto;
+    height: auto;
+    min-height: 100%;
+  }
+
+  .walls {
+    order: 1;
+    max-height: none;
+    border-right: none;
+    border-bottom: 1px solid var(--swpv-border);
+  }
+
+  .stage {
+    order: 2;
+    min-height: 60vh;
+  }
+
+  .panel {
+    order: 3;
+    border-left: none;
+    border-top: 1px solid var(--swpv-border);
+  }
+}

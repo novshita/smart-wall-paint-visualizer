@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { Shell } from './core/layout/shell';
 import { authGuard, guestGuard } from './core/auth/auth.guards';
+import { editorLeaveGuard } from './features/editor/editor-leave.guard';
 
 // Every feature is lazy-loaded. Remaining pages from spec §5 are added as each feature is built.
 export const routes: Routes = [
@@ -53,10 +54,25 @@ export const routes: Routes = [
             loadComponent: () => import('./features/upload/upload').then((m) => m.Upload),
           },
           {
-            path: ':id/select',
-            title: 'Select walls · Wall Visualizer',
+            // Editor: the shell loads the project once; both steps share its state
+            path: ':id',
             loadComponent: () =>
-              import('./features/wall-selection/wall-selection').then((m) => m.WallSelection),
+              import('./features/editor/editor-shell').then((m) => m.EditorShell),
+            canDeactivate: [editorLeaveGuard],
+            children: [
+              { path: '', pathMatch: 'full', redirectTo: 'select' },
+              {
+                path: 'select',
+                title: 'Select walls · Wall Visualizer',
+                loadComponent: () =>
+                  import('./features/wall-selection/wall-selection').then((m) => m.WallSelection),
+              },
+              {
+                path: 'studio',
+                title: 'Paint · Wall Visualizer',
+                loadComponent: () => import('./features/studio/studio').then((m) => m.Studio),
+              },
+            ],
           },
         ],
       },

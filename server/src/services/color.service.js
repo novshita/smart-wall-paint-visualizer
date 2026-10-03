@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const { Color } = require('../models');
 const { escapeRegex } = require('../utils/regex');
 
@@ -22,8 +23,9 @@ function familyRank(family) {
 }
 
 /** Builds a Mongo filter from validated list query params. Only active colours are public. */
-function buildColorFilter({ q, family, brand, finish, tag }) {
+function buildColorFilter({ q, family, brand, finish, tag, ids }) {
   const filter = { isActive: true };
+  if (ids) filter._id = { $in: ids.split(',').map((id) => new mongoose.Types.ObjectId(id)) };
   if (family) filter.family = family;
   if (brand) filter.brand = brand;
   if (finish) filter.finishes = finish;

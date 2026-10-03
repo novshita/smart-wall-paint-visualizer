@@ -48,6 +48,22 @@ async function getById(req, res) {
   res.json({ project: projectService.toResponse(project) });
 }
 
+/** Saves selections/styles/variants (owner only; admins have read-only access, FR-AD5). */
+async function update(req, res) {
+  const project = await projectService.findAccessible(req.params.id, req.user, {
+    allowAdmin: false,
+  });
+  const { title, status, variants } = req.body;
+
+  if (title !== undefined) project.title = title || 'My room';
+  if (variants !== undefined) project.variants = variants;
+  if (status !== undefined) project.status = status;
+  await project.save();
+
+  if (status === 'saved') await logActivity(req.user._id, 'save', { projectId: project._id });
+  res.json({ project: projectService.toResponse(project) });
+}
+
 async function remove(req, res) {
   const project = await projectService.findAccessible(req.params.id, req.user);
   await projectService.deleteProject(project);
@@ -58,4 +74,4 @@ async function remove(req, res) {
   res.status(204).end();
 }
 
-module.exports = { create, list, getById, remove };
+module.exports = { create, list, getById, update, remove };

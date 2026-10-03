@@ -32,7 +32,14 @@ function createApp() {
 
   if (!env.isTest) app.use(morgan(env.isProduction ? 'combined' : 'dev'));
 
-  app.use(express.json({ limit: '1mb' }));
+  // Saving a design carries brush strokes, so that one route gets a larger body limit
+  const projectJson = express.json({ limit: '5mb' });
+  const defaultJson = express.json({ limit: '1mb' });
+  app.use((req, res, next) =>
+    req.method === 'PUT' && /^\/api\/v1\/projects\/[^/]+\/?$/.test(req.path)
+      ? projectJson(req, res, next)
+      : defaultJson(req, res, next),
+  );
   app.use(express.urlencoded({ extended: false, limit: '1mb' }));
   app.use(sanitize);
 

@@ -1,0 +1,101 @@
+<div class="head">
+  <h2>Walls</h2>
+  @if (mode() === 'select') {
+    <button mat-stroked-button type="button" (click)="store.addWall()">
+      <mat-icon>add</mat-icon>
+      Add wall
+    </button>
+  }
+</div>
+
+@if (store.regions().length) {
+  <ul
+    class="walls"
+    role="listbox"
+    aria-label="Walls"
+    [attr.aria-activedescendant]="store.activeRegionId() ? 'wall-' + store.activeRegionId() : null"
+  >
+    @for (region of store.regions(); track region.regionId; let i = $index) {
+      @let active = region.regionId === store.activeRegionId();
+      @let painted = paint()[region.regionId];
+      <li
+        [id]="'wall-' + region.regionId"
+        class="wall"
+        [class.active]="active"
+        role="option"
+        [attr.aria-selected]="active"
+        tabindex="0"
+        (click)="store.activeRegionId.set(region.regionId)"
+        (keydown.enter)="store.activeRegionId.set(region.regionId)"
+        (keydown.space)="store.activeRegionId.set(region.regionId); $event.preventDefault()"
+      >
+        @if (mode() === 'paint') {
+          <span
+            class="chip paint"
+            [class.empty]="!painted"
+            [style.background]="painted?.hex ?? null"
+            aria-hidden="true"
+          ></span>
+        } @else {
+          <span class="chip" [style.background]="overlayColor(i)" aria-hidden="true"></span>
+        }
+
+        <span class="text">
+          @if (editingId() === region.regionId) {
+            <input
+              [id]="'rename-' + region.regionId"
+              class="rename"
+              [value]="region.name"
+              maxlength="100"
+              aria-label="Wall name"
+              (click)="$event.stopPropagation()"
+              (keydown.enter)="finishRename(region, $any($event.target).value)"
+              (keydown.escape)="editingId.set(null)"
+              (blur)="finishRename(region, $any($event.target).value)"
+            />
+          } @else {
+            <span class="name">{{ region.name }}</span>
+          }
+          <span class="sub">
+            @if (!hasArea(region.selection)) {
+              Not selected yet
+            } @else if (mode() === 'paint') {
+              {{ painted?.label ?? 'No paint yet' }}
+            } @else {
+              Selected
+            }
+          </span>
+        </span>
+
+        @if (mode() === 'select') {
+          <button
+            mat-icon-button
+            type="button"
+            (click)="startRename(region); $event.stopPropagation()"
+            [attr.aria-label]="'Rename ' + region.name"
+            matTooltip="Rename"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            type="button"
+            (click)="remove(region); $event.stopPropagation()"
+            [attr.aria-label]="'Delete ' + region.name"
+            matTooltip="Delete"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        }
+      </li>
+    }
+  </ul>
+} @else {
+  <p class="muted empty">
+    @if (mode() === 'select') {
+      No walls yet. Pick the polygon or brush tool and start tracing a wall.
+    } @else {
+      No walls selected yet. Go back to step 1 to select walls.
+    }
+  </p>
+}

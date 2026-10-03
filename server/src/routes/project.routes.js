@@ -14,6 +14,7 @@ router.use(authenticate);
 router.post('/', uploadLimiter, uploadImage('image'), validate(schemas.createProject), ctrl.create);
 router.get('/', validate(schemas.listProjects, 'query'), ctrl.list);
 router.get('/:id', validate(idParam, 'params'), ctrl.getById);
+router.put('/:id', validate(idParam, 'params'), validate(schemas.updateProject), ctrl.update);
 router.delete('/:id', validate(idParam, 'params'), ctrl.remove);
 
 module.exports = router;

@@ -13,11 +13,25 @@ const imageSchema = new Schema(
   { _id: false },
 );
 
+// A brush/eraser stroke. Coordinates are normalised to the image (0–1), and `size`
+// is the brush diameter as a fraction of image width, so masks can be re-rendered
+// at any resolution (working preview or full-size export, spec §8.6).
+const strokeSchema = new Schema(
+  {
+    mode: { type: String, enum: ['add', 'erase'], required: true },
+    size: { type: Number, min: 0.0005, max: 0.5, required: true },
+    points: { type: [[Number]], required: true },
+  },
+  { _id: false },
+);
+
+// Wall selection: an optional polygon, refined by brush/eraser strokes applied in order.
+// `type` is 'polygon' for polygon-only selections and 'mask' once brush strokes are used.
 const selectionSchema = new Schema(
   {
     type: { type: String, enum: ['polygon', 'mask'], required: true },
     points: { type: [[Number]], default: undefined },
-    maskUrl: String,
+    strokes: { type: [strokeSchema], default: undefined },
     feather: { type: Number, min: 0, max: 50, default: 0 },
   },
   { _id: false },
