@@ -12,7 +12,10 @@ module.exports = [
       globals: { ...globals.node, ...globals.mocha, expect: 'readonly' },
     },
     rules: {
-      'no-unused-vars': ['error', { argsIgnorePattern: '^_|^next$|^req$|^res$' }],
+      'no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_|^next$|^req$|^res$', ignoreRestSiblings: true },
+      ],
       'no-console': 'off',
     },
   },

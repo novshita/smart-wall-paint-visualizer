@@ -44,6 +44,23 @@ export const routes: Routes = [
         loadComponent: () => import('./features/profile/profile').then((m) => m.Profile),
       },
       {
+        path: 'projects',
+        canActivate: [authGuard],
+        children: [
+          {
+            path: 'new',
+            title: 'Upload a room · Wall Visualizer',
+            loadComponent: () => import('./features/upload/upload').then((m) => m.Upload),
+          },
+          {
+            path: ':id/select',
+            title: 'Select walls · Wall Visualizer',
+            loadComponent: () =>
+              import('./features/wall-selection/wall-selection').then((m) => m.WallSelection),
+          },
+        ],
+      },
+      {
         path: 'colors',
         children: [
           {

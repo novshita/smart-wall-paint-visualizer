@@ -246,7 +246,7 @@ npx ng lint
 - [x] Project foundation (API skeleton, models, seed data, Angular shell, CI)
 - [x] Authentication and user roles (register, login, profile, password change, role guards)
 - [x] Colour library (browse by family, search, filters, swatch detail, favourites)
-- [ ] Image upload
+- [x] Image upload (validation, metadata stripping, private signed links, dashboard recent designs)
 - [ ] Manual wall selection (polygon and brush)
 - [ ] Colour and pattern application with realistic blending
 - [ ] Save, reopen, and download designs

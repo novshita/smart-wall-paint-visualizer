@@ -4,6 +4,8 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { provideRouter } from '@angular/router';
 import { ColorDetail } from './color-detail';
 import { AuthService } from '../../core/auth/auth.service';
+import { SettingsService } from '../../core/settings/settings.service';
+import { signal } from '@angular/core';
 
 const sage = {
   _id: 'c1',
@@ -27,6 +29,10 @@ describe('ColorDetail page', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: AuthService, useValue: { user: () => null, isLoggedIn: () => false } },
+        {
+          provide: SettingsService,
+          useValue: { settings: signal({ disclaimerText: 'Disclaimer' }) },
+        },
       ],
     });
     http = TestBed.inject(HttpTestingController);
