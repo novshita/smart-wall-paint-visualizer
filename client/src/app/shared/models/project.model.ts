@@ -1,3 +1,5 @@
+import { Region } from '../../core/editor/editor.model';
+
 export interface ProjectImage {
   /** Short-lived signed URL; refetch the project to get a fresh one */
   url: string;
@@ -10,7 +12,7 @@ export interface ProjectImage {
 export interface Variant {
   variantId: string;
   name: string;
-  regions: unknown[]; // typed properly with wall selection (step 5)
+  regions: Region[];
   renderUrl?: string;
 }
 

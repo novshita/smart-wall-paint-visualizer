@@ -1,0 +1,158 @@
+<div class="editor">
+  <nav class="rail" aria-label="Selection tools">
+    @for (t of tools; track t.id) {
+      <button
+        mat-icon-button
+        type="button"
+        class="tool"
+        [class.on]="tool() === t.id"
+        [attr.aria-pressed]="tool() === t.id"
+        [attr.aria-label]="t.label + ' (' + t.key + ')'"
+        [matTooltip]="t.label + ' (' + t.key + ')'"
+        matTooltipPosition="right"
+        (click)="setTool(t.id)"
+      >
+        <mat-icon>{{ t.icon }}</mat-icon>
+      </button>
+    }
+  </nav>
+
+  <section class="stage" aria-label="Wall selection canvas">
+    <div class="toolbar">
+      <button
+        mat-icon-button
+        type="button"
+        (click)="undo()"
+        [disabled]="!store.canUndo() && !canvas().drafting()"
+        aria-label="Undo (Ctrl+Z)"
+        matTooltip="Undo (Ctrl+Z)"
+      >
+        <mat-icon>undo</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        type="button"
+        (click)="redo()"
+        [disabled]="!store.canRedo()"
+        aria-label="Redo (Ctrl+Shift+Z)"
+        matTooltip="Redo (Ctrl+Shift+Z)"
+      >
+        <mat-icon>redo</mat-icon>
+      </button>
+      <p class="guidance" aria-live="polite">{{ guidance() }}</p>
+      <div class="zoom">
+        <button
+          mat-icon-button
+          type="button"
+          (click)="canvas().zoomBy(0.8)"
+          aria-label="Zoom out (−)"
+          matTooltip="Zoom out (−)"
+        >
+          <mat-icon>zoom_out</mat-icon>
+        </button>
+        <span class="pct">{{ zoomPercent() | number: '1.0-0' }}%</span>
+        <button
+          mat-icon-button
+          type="button"
+          (click)="canvas().zoomBy(1.25)"
+          aria-label="Zoom in (+)"
+          matTooltip="Zoom in (+)"
+        >
+          <mat-icon>zoom_in</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          type="button"
+          (click)="canvas().fit()"
+          aria-label="Fit to screen (0)"
+          matTooltip="Fit to screen (0)"
+        >
+          <mat-icon>fit_screen</mat-icon>
+        </button>
+      </div>
+    </div>
+    <div class="canvas-wrap">
+      <app-selection-canvas [tool]="tool()" [brushSize]="brushSize()" [panMode]="spaceHeld()" />
+    </div>
+  </section>
+
+  <aside class="panel">
+    <app-wall-list mode="select" />
+
+    @if (active(); as wall) {
+      <section class="settings" aria-labelledby="settings-heading">
+        <h2 id="settings-heading">{{ wall.name }}</h2>
+
+        @if (tool() === 'brush' || tool() === 'eraser') {
+          <label class="field-label" for="brush-size">Brush size · {{ brushSize() }} px</label>
+          <mat-slider min="4" max="250" step="1" class="slider">
+            <input
+              id="brush-size"
+              matSliderThumb
+              [value]="brushSize()"
+              (valueChange)="brushSize.set($event)"
+            />
+          </mat-slider>
+        }
+
+        <label class="field-label" for="feather"
+          >Edge softness · {{ wall.selection.feather }} px</label
+        >
+        <mat-slider min="0" max="20" step="1" class="slider">
+          <input
+            id="feather"
+            matSliderThumb
+            [value]="wall.selection.feather"
+            (input)="setFeather(+$any($event.target).value, true)"
+            (change)="setFeather(+$any($event.target).value, false)"
+          />
+        </mat-slider>
+        <p class="muted small">
+          Softer edges blend the paint into corners and ceilings more naturally.
+        </p>
+
+        <button mat-button type="button" (click)="clearWall()">
+          <mat-icon>layers_clear</mat-icon>
+          Clear this wall's selection
+        </button>
+      </section>
+    }
+
+    <details class="tips">
+      <summary>Tips & shortcuts</summary>
+      <ul>
+        <li>
+          <strong>Polygon (P):</strong> click corners; click the first point or press Enter to
+          finish.
+        </li>
+        <li><strong>Adjust:</strong> with the polygon tool, drag any corner point.</li>
+        <li>
+          <strong>Brush (B) / Eraser (E):</strong> paint to add or remove areas such as windows.
+          <kbd>[</kbd> <kbd>]</kbd> change size.
+        </li>
+        <li>
+          <strong>Move (V):</strong> drag to pan, click a wall to select it. Hold
+          <kbd>Space</kbd> to pan with any tool.
+        </li>
+        <li>
+          <strong>Zoom:</strong> scroll, pinch, or <kbd>+</kbd> / <kbd>−</kbd>; <kbd>0</kbd> fits
+          the photo.
+        </li>
+        <li>
+          <strong>Undo:</strong> <kbd>Ctrl</kbd>+<kbd>Z</kbd>, redo with
+          <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd>.
+        </li>
+      </ul>
+    </details>
+
+    <div class="next">
+      <button mat-flat-button type="button" (click)="continue()" [disabled]="!canContinue()">
+        Next: paint walls
+        <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+      </button>
+      @if (!canContinue()) {
+        <p class="muted small">Select at least one wall to continue.</p>
+      }
+    </div>
+  </aside>
+</div>

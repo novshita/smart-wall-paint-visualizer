@@ -1,0 +1,87 @@
+@if (ready()) {
+  @let project = store.project()!;
+  <header class="bar">
+    <a
+      mat-icon-button
+      routerLink="/dashboard"
+      aria-label="Back to dashboard"
+      matTooltip="Dashboard"
+    >
+      <mat-icon>arrow_back</mat-icon>
+    </a>
+
+    <label class="visually-hidden" for="project-title">Project name</label>
+    <input
+      id="project-title"
+      class="title"
+      [value]="project.title"
+      maxlength="150"
+      (change)="rename($event)"
+      (keydown.enter)="$any($event.target).blur()"
+    />
+
+    <nav class="steps" aria-label="Editor steps">
+      <a
+        routerLink="select"
+        routerLinkActive="active"
+        #selectLink="routerLinkActive"
+        [attr.aria-current]="selectLink.isActive ? 'step' : null"
+      >
+        <span class="num">1</span> Select walls
+      </a>
+      <mat-icon aria-hidden="true" class="chevron">chevron_right</mat-icon>
+      <a
+        routerLink="studio"
+        routerLinkActive="active"
+        #studioLink="routerLinkActive"
+        [attr.aria-current]="studioLink.isActive ? 'step' : null"
+      >
+        <span class="num">2</span> Paint
+      </a>
+    </nav>
+
+    <span class="spacer"></span>
+
+    <span class="save {{ store.saveState() }}" role="status" aria-live="polite">
+      @switch (store.saveState()) {
+        @case ('saving') {
+          <mat-spinner diameter="14" aria-hidden="true" />
+        }
+        @case ('error') {
+          <mat-icon aria-hidden="true">error</mat-icon>
+        }
+        @case ('saved') {
+          <mat-icon aria-hidden="true">cloud_done</mat-icon>
+        }
+        @default {
+          <mat-icon aria-hidden="true">edit</mat-icon>
+        }
+      }
+      {{ saveLabel() }}
+    </span>
+    @if (store.saveState() === 'error') {
+      <button mat-button type="button" (click)="retrySave()" [matTooltip]="store.saveError() ?? ''">
+        Retry
+      </button>
+    }
+  </header>
+
+  <div class="workspace">
+    <router-outlet />
+  </div>
+} @else if (notFound()) {
+  <div class="state page">
+    <mat-icon aria-hidden="true">search_off</mat-icon>
+    <h1>Project not found</h1>
+    <p class="muted">It may have been deleted, or it belongs to another account.</p>
+    <a mat-flat-button routerLink="/dashboard">Go to dashboard</a>
+  </div>
+} @else if (resource.error() || imageError()) {
+  <div class="state page" role="alert">
+    <mat-icon aria-hidden="true">cloud_off</mat-icon>
+    <p>We couldn't open this project. Check your connection and try again.</p>
+    <button mat-stroked-button type="button" (click)="resource.reload()">Retry</button>
+  </div>
+} @else {
+  <div class="state page" aria-label="Opening project"><mat-spinner diameter="40" /></div>
+}

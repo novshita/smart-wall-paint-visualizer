@@ -17,3 +17,10 @@ export function readableTextColor(hex: string): '#1d2427' | '#ffffff' {
 export function formatRgb({ r, g, b }: { r: number; g: number; b: number }): string {
   return `rgb(${r}, ${g}, ${b})`;
 }
+
+/** "#A7B49A" → [167, 180, 154]; returns null for anything that isn't #RRGGBB. */
+export function hexToRgb(hex: string | undefined | null): [number, number, number] | null {
+  if (!hex || !/^#[0-9a-f]{6}$/i.test(hex)) return null;
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}

@@ -91,6 +91,7 @@ module.exports = {
           query('finish', { type: 'string', enum: ['matte', 'satin', 'glossy'] }),
           query('tag', { type: 'string' }, 'e.g. Bedroom, Accent'),
           query('sort', { type: 'string', enum: ['family', 'name', 'code'], default: 'family' }),
+          query('ids', { type: 'string' }, 'Comma-separated colour ids (max 100)'),
           ...pageParams,
         ],
         responses: { 200: json(page(ref('Color'))), 400: errorResponse('Invalid query') },

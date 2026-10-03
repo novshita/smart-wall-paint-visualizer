@@ -118,6 +118,58 @@ module.exports = {
           404: errorResponse('Not found or not yours'),
         },
       },
+      put: {
+        tags: ['Projects'],
+        summary: 'Save walls, styles and variants (owner only)',
+        description:
+          'Coordinates are normalised to the image (0–1). A wall is an optional polygon refined by brush/eraser strokes (`size` = brush diameter as a fraction of image width). Body limit 5 MB.',
+        security: auth,
+        parameters: [idParam],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              example: {
+                status: 'draft',
+                variants: [
+                  {
+                    variantId: 'v1',
+                    name: 'Design 1',
+                    regions: [
+                      {
+                        regionId: 'wall-1',
+                        name: 'Accent wall',
+                        selection: {
+                          type: 'mask',
+                          points: [
+                            [0.1, 0.1],
+                            [0.5, 0.1],
+                            [0.5, 0.8],
+                            [0.1, 0.8],
+                          ],
+                          strokes: [{ mode: 'erase', size: 0.02, points: [[0.2, 0.3]] }],
+                          feather: 2,
+                        },
+                        style: {
+                          mode: 'solid',
+                          colorId: '<colour id>',
+                          opacity: 100,
+                          finish: 'matte',
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+        },
+        responses: {
+          200: json({ type: 'object', properties: { project: ref('Project') } }),
+          400: errorResponse('Invalid geometry or style'),
+          404: errorResponse('Not found or not yours'),
+        },
+      },
       delete: {
         tags: ['Projects'],
         summary: 'Delete a project and its images permanently (owner or admin)',

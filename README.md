@@ -247,8 +247,9 @@ npx ng lint
 - [x] Authentication and user roles (register, login, profile, password change, role guards)
 - [x] Colour library (browse by family, search, filters, swatch detail, favourites)
 - [x] Image upload (validation, metadata stripping, private signed links, dashboard recent designs)
-- [ ] Manual wall selection (polygon and brush)
-- [ ] Colour and pattern application with realistic blending
+- [x] Manual wall selection (polygon, brush, eraser, multiple walls, undo/redo, zoom/pan, soft edges)
+- [x] Solid colour application with realistic blending, finishes, before/after, auto-save
+- [ ] Dual-tone walls, patterns, and design variants
 - [ ] Save, reopen, and download designs
 - [ ] Admin panel and KPI dashboard
 - [ ] Cloud deployment

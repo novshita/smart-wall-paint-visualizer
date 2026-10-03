@@ -1,0 +1,203 @@
+<section class="current" aria-labelledby="paint-heading">
+  <h2 id="paint-heading">Paint “{{ region().name }}”</h2>
+  @if (hex(); as h) {
+    <div class="applied" [style.background]="h" [style.color]="textColor()">
+      @if (color(); as c) {
+        <strong>{{ c.name }}</strong>
+        <span>{{ c.code }} · {{ c.brand }}</span>
+      } @else {
+        <strong>Custom colour</strong>
+      }
+      <span class="hex">{{ h }}</span>
+    </div>
+  } @else {
+    <p class="muted pick">Choose a colour below to paint this wall.</p>
+  }
+</section>
+
+<mat-tab-group class="paint-tabs" animationDuration="0ms">
+  <mat-tab label="Library">
+    <div class="tab-body">
+      <input
+        class="search"
+        type="search"
+        placeholder="Search name, code or #HEX"
+        aria-label="Search colours"
+        [value]="search()"
+        (input)="search.set($any($event.target).value)"
+      />
+      @if (facets.hasValue()) {
+        <div class="families" role="group" aria-label="Colour family">
+          <button type="button" class="fam" [class.on]="!family()" (click)="family.set(null)">
+            All
+          </button>
+          @for (f of facets.value().families; track f.value) {
+            <button
+              type="button"
+              class="fam"
+              [class.on]="family() === f.value"
+              [attr.aria-pressed]="family() === f.value"
+              (click)="family.set(family() === f.value ? null : f.value)"
+            >
+              <span class="dot" [style.background]="f.sampleHex" aria-hidden="true"></span
+              >{{ f.value }}
+            </button>
+          }
+        </div>
+      }
+      @if (library.hasValue()) {
+        <ng-container
+          *ngTemplateOutlet="
+            grid;
+            context: { $implicit: library.value().items, empty: 'No colours match.' }
+          "
+        />
+      } @else if (library.error()) {
+        <p class="muted">
+          Couldn't load colours.
+          <button mat-button type="button" (click)="library.reload()">Retry</button>
+        </p>
+      } @else {
+        <p class="muted">Loading colours…</p>
+      }
+    </div>
+  </mat-tab>
+
+  <mat-tab label="Favourites">
+    <div class="tab-body">
+      <ng-container
+        *ngTemplateOutlet="
+          grid;
+          context: {
+            $implicit: favorites.colors(),
+            empty: 'Tap the heart on a colour in the library to save favourites.',
+          }
+        "
+      />
+    </div>
+  </mat-tab>
+
+  <mat-tab label="Recent">
+    <div class="tab-body">
+      <ng-container
+        *ngTemplateOutlet="
+          grid;
+          context: { $implicit: recentColors(), empty: 'Colours you use will appear here.' }
+        "
+      />
+    </div>
+  </mat-tab>
+
+  <mat-tab label="Custom">
+    <div class="tab-body custom">
+      <label class="field-label" for="custom-picker">Pick any colour</label>
+      <div class="custom-row">
+        <input
+          id="custom-picker"
+          type="color"
+          [value]="customValid() ? customHex() : '#a7b49a'"
+          (input)="customHex.set($any($event.target).value.toUpperCase())"
+          aria-label="Colour picker"
+        />
+        <input
+          class="hex-input"
+          [class.invalid]="!customValid()"
+          [value]="customHex()"
+          (input)="customHex.set($any($event.target).value.trim())"
+          (keydown.enter)="applyCustom()"
+          maxlength="7"
+          aria-label="HEX colour code"
+          placeholder="#RRGGBB"
+        />
+        <button mat-flat-button type="button" (click)="applyCustom()" [disabled]="!customValid()">
+          Apply
+        </button>
+      </div>
+      @if (!customValid()) {
+        <p class="error small">Use a 6-digit HEX code like #A7B49A.</p>
+      }
+    </div>
+  </mat-tab>
+</mat-tab-group>
+
+<ng-template #grid let-colors let-empty="empty">
+  @if (colors.length) {
+    <ul class="swatches">
+      @for (c of colors; track c._id) {
+        <li>
+          <button
+            type="button"
+            class="swatch"
+            [class.current]="isCurrent(c)"
+            [style.background]="c.hex"
+            [attr.aria-pressed]="isCurrent(c)"
+            [attr.aria-label]="c.name + ', ' + c.code"
+            [matTooltip]="c.name + ' · ' + c.code"
+            (click)="apply(c)"
+          ></button>
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="muted small">{{ empty }}</p>
+  }
+</ng-template>
+
+@if (hex()) {
+  <section class="adjust" aria-label="Adjustments">
+    <span class="field-label" id="finish-label">Finish</span>
+    <mat-button-toggle-group
+      class="finish"
+      aria-labelledby="finish-label"
+      [value]="finish()"
+      (change)="setFinish($event.value)"
+    >
+      @for (f of finishes; track f) {
+        <mat-button-toggle [value]="f">{{ f | titlecase }}</mat-button-toggle>
+      }
+    </mat-button-toggle-group>
+
+    <label class="field-label" for="opacity">Opacity · {{ style().opacity ?? 100 }}%</label>
+    <mat-slider min="0" max="100" step="1" class="slider">
+      <input
+        id="opacity"
+        matSliderThumb
+        [value]="style().opacity ?? 100"
+        (input)="adjust('opacity', +$any($event.target).value, false)"
+        (change)="adjust('opacity', +$any($event.target).value, true)"
+      />
+    </mat-slider>
+
+    <label class="field-label" for="brightness"
+      >Brightness · {{ (style().brightness ?? 0) > 0 ? '+' : ''
+      }}{{ style().brightness ?? 0 }}</label
+    >
+    <mat-slider min="-50" max="50" step="1" class="slider">
+      <input
+        id="brightness"
+        matSliderThumb
+        [value]="style().brightness ?? 0"
+        (input)="adjust('brightness', +$any($event.target).value, false)"
+        (change)="adjust('brightness', +$any($event.target).value, true)"
+      />
+    </mat-slider>
+
+    <label class="field-label" for="softness"
+      >Edge softness · {{ region().selection.feather }} px</label
+    >
+    <mat-slider min="0" max="20" step="1" class="slider">
+      <input
+        id="softness"
+        matSliderThumb
+        [value]="region().selection.feather"
+        (input)="setFeather(+$any($event.target).value, false)"
+        (change)="setFeather(+$any($event.target).value, true)"
+      />
+    </mat-slider>
+
+    <button mat-button type="button" (click)="removePaint()">
+      <mat-icon>format_color_reset</mat-icon>
+      Remove paint from this wall
+    </button>
+  </section>
+}

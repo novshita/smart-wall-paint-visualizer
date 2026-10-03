@@ -68,3 +68,9 @@ h3 {
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+// Studio colour tabs: four short labels must fit the side panel without scroll arrows
+.paint-tabs .mat-mdc-tab {
+  min-width: 0;
+  padding-inline: 6px;
+}
