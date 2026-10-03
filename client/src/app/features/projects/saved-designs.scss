@@ -1,0 +1,125 @@
+@use 'tokens' as *;
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--swpv-space-3);
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--swpv-space-4);
+
+  a {
+    min-height: var(--swpv-touch-target);
+  }
+}
+
+.filters {
+  margin-bottom: var(--swpv-space-4);
+}
+
+mat-progress-bar {
+  margin-bottom: var(--swpv-space-3);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--swpv-space-4);
+  margin: 0 0 var(--swpv-space-5);
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  overflow: hidden;
+  border: 1px solid var(--swpv-border);
+  border-radius: var(--swpv-radius);
+  background: #fff;
+
+  &:hover,
+  &:focus-within {
+    box-shadow: var(--swpv-shadow);
+  }
+}
+
+.thumb {
+  position: relative;
+  display: block;
+
+  img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    background: var(--swpv-surface-alt);
+  }
+}
+
+.status {
+  position: absolute;
+  top: var(--swpv-space-2);
+  left: var(--swpv-space-2);
+  padding: 2px var(--swpv-space-2);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 92%);
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  &.saved {
+    background: var(--swpv-brand);
+    color: #fff;
+  }
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  gap: var(--swpv-space-1);
+  padding: var(--swpv-space-2) var(--swpv-space-1) var(--swpv-space-2) var(--swpv-space-3);
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.title {
+  overflow: hidden;
+  color: var(--swpv-ink);
+  font-weight: 600;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  font-size: 0.8rem;
+}
+
+.danger {
+  color: var(--mat-sys-error);
+}
+
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--swpv-space-3);
+  padding: var(--swpv-space-8) var(--swpv-space-4);
+  border: 2px dashed var(--swpv-border);
+  border-radius: var(--swpv-radius);
+  color: var(--swpv-muted);
+  text-align: center;
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+  }
+
+  p {
+    margin: 0;
+  }
+}

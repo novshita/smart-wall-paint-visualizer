@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const fs = require('fs/promises');
+const { constants } = require('fs');
 const path = require('path');
 const env = require('../config/env');
 
@@ -31,6 +32,12 @@ class LocalStorage {
     const file = this.pathFor(key);
     await fs.mkdir(path.dirname(file), { recursive: true });
     await fs.writeFile(file, buffer, { flag: 'wx' }); // never overwrite
+  }
+
+  async copy(fromKey, toKey) {
+    const target = this.pathFor(toKey);
+    await fs.mkdir(path.dirname(target), { recursive: true });
+    await fs.copyFile(this.pathFor(fromKey), target, constants.COPYFILE_EXCL);
   }
 
   async remove(key) {

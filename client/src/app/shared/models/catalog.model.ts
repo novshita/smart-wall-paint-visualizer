@@ -22,6 +22,10 @@ export interface Pattern {
   tileSize?: { width: number; height: number };
 }
 
+export interface PatternPage extends Page<Pattern> {
+  categories: string[];
+}
+
 export interface Page<T> {
   items: T[];
   total: number;

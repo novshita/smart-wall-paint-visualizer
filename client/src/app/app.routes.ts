@@ -49,6 +49,13 @@ export const routes: Routes = [
         canActivate: [authGuard],
         children: [
           {
+            path: '',
+            pathMatch: 'full',
+            title: 'My designs · Wall Visualizer',
+            loadComponent: () =>
+              import('./features/projects/saved-designs').then((m) => m.SavedDesigns),
+          },
+          {
             path: 'new',
             title: 'Upload a room · Wall Visualizer',
             loadComponent: () => import('./features/upload/upload').then((m) => m.Upload),

@@ -13,6 +13,13 @@
   <nav class="nav" aria-label="Main">
     @if (auth.isLoggedIn()) {
       <a mat-button routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a
+        mat-button
+        routerLink="/projects"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        >My designs</a
+      >
     }
     <a mat-button routerLink="/colors" routerLinkActive="active">Colours</a>
     <a mat-button routerLink="/help" routerLinkActive="active">How to use</a>
@@ -40,6 +47,10 @@
       <a mat-menu-item routerLink="/dashboard">
         <mat-icon>dashboard</mat-icon>
         <span>Dashboard</span>
+      </a>
+      <a mat-menu-item routerLink="/projects">
+        <mat-icon>photo_library</mat-icon>
+        <span>My designs</span>
       </a>
       <a mat-menu-item routerLink="/profile">
         <mat-icon>person</mat-icon>

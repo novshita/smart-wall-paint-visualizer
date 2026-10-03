@@ -14,6 +14,7 @@ interface Snapshot {
 }
 
 const AUTOSAVE_DELAY_MS = 1200;
+export const MAX_VARIANTS = 10;
 
 /** Distinct overlay colours for walls on the selection screen */
 export const WALL_COLORS = ['#1f8fff', '#ff6b3d', '#2ec27e', '#c061cb', '#f5c211', '#00b8d4'];
@@ -43,8 +44,9 @@ export class EditorStore {
   readonly saveState = signal<SaveState>('saved');
   readonly saveError = signal<string | null>(null);
 
-  readonly variant = computed(
-    () => this.variants().find((v) => v.variantId === this.activeVariantId()) ?? this.variants()[0],
+  readonly variant = computed<Variant | undefined>(
+    () =>
+      this.variants().find((v) => v.variantId === this.activeVariantId()) ?? this.variants().at(0),
   );
   readonly regions = computed<Region[]>(() => this.variant()?.regions ?? []);
   readonly activeRegion = computed(
@@ -148,6 +150,57 @@ export class EditorStore {
       this.mapRegion(variants, regionId, (r) => ({ ...r, selection: normalised }), true);
     if (history) this.commit(apply);
     else this.preview(apply);
+  }
+
+  // ---------- design variants (FR-C6) ----------
+
+  /** Switching variants is navigation, not an edit: no undo step, nothing to save. */
+  selectVariant(variantId: string): void {
+    if (this.variants().some((v) => v.variantId === variantId)) this.activeVariantId.set(variantId);
+  }
+
+  /** Adds a variant copying the current one's colours (walls are always shared). */
+  addVariant(): string | null {
+    if (this.variants().length >= MAX_VARIANTS) return null;
+    const source = this.variant();
+    const variantId = newId('v');
+    const names = new Set(this.variants().map((v) => v.name));
+    let n = this.variants().length + 1;
+    while (names.has(`Design ${n}`)) n++;
+    const copy: Variant = {
+      variantId,
+      name: `Design ${n}`,
+      regions: (source?.regions ?? []).map((r) => ({ ...r, style: { ...r.style } })),
+    };
+    this.commit((variants) => [...variants, copy]);
+    this.activeVariantId.set(variantId);
+    return variantId;
+  }
+
+  renameVariant(variantId: string, name: string): void {
+    const trimmed = name.trim().slice(0, 100);
+    if (!trimmed) return;
+    this.commit((variants) =>
+      variants.map((v) => (v.variantId === variantId ? { ...v, name: trimmed } : v)),
+    );
+  }
+
+  deleteVariant(variantId: string): void {
+    const list = this.variants();
+    if (list.length <= 1) return;
+    const index = list.findIndex((v) => v.variantId === variantId);
+    this.commit((variants) => variants.filter((v) => v.variantId !== variantId));
+    if (this.activeVariantId() === variantId) {
+      const remaining = this.variants();
+      this.activeVariantId.set(remaining[Math.min(index, remaining.length - 1)].variantId);
+    }
+  }
+
+  /** Records the latest rendered preview URL for a variant (from POST /render). */
+  setRenderUrl(variantId: string, renderUrl: string | undefined): void {
+    this.variants.update((variants) =>
+      variants.map((v) => (v.variantId === variantId ? { ...v, renderUrl } : v)),
+    );
   }
 
   // ---------- styles (active variant only) ----------

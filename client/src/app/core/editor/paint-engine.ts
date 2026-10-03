@@ -2,12 +2,16 @@ import { Finish } from '../../shared/models/catalog.model';
 import { Bounds, alphaBounds, expandBounds, featherAlpha } from './blur';
 import { Selection } from './editor.model';
 import { rasterizeAlpha } from './mask';
-import { luminanceMap, meanLuminance, paintRegion } from './paint';
+import { Rgb, luminanceMap, meanLuminance, paintRegion } from './paint';
 
 export interface PaintLayer {
   regionId: string;
   selection: Selection;
-  rgb: readonly [number, number, number];
+  rgb: Rgb;
+  secondaryRgb?: Rgb;
+  split?: { direction: 'horizontal' | 'vertical'; position: number };
+  /** Pattern coverage at the engine's resolution (see pattern-field.ts) */
+  pattern?: Uint8Array;
   opacity: number;
   brightness: number;
   finish: Finish;
@@ -16,7 +20,10 @@ export interface PaintLayer {
 interface MaskEntry {
   selection: Selection;
   alpha: Uint8ClampedArray;
+  /** Painted area including the feather margin */
   bounds: Bounds | null;
+  /** The wall's own extent before feathering */
+  extent: Bounds | null;
   mean: number;
 }
 
@@ -51,7 +58,16 @@ export class PaintEngine {
     for (const layer of layers) {
       const mask = this.mask(layer.regionId, layer.selection);
       if (!mask.bounds) continue;
-      paintRegion(out.data, this.lum, mask.alpha, this.width, mask.bounds, mask.mean, layer);
+      paintRegion(
+        out.data,
+        this.lum,
+        mask.alpha,
+        this.width,
+        mask.bounds,
+        mask.mean,
+        layer,
+        mask.extent!,
+      );
     }
     this.prune(layers);
     return performance.now() - start;
@@ -63,14 +79,15 @@ export class PaintEngine {
 
     const { width: w, height: h } = this;
     const alpha = this.rasterize(selection, w, h);
-    let bounds = alphaBounds(alpha, w, h);
+    const extent = alphaBounds(alpha, w, h);
+    let bounds = extent;
     const feather = Math.round(selection.feather ?? 0);
     if (bounds && feather > 0) {
       bounds = expandBounds(bounds, feather * 3, w, h);
       featherAlpha(alpha, w, h, feather, bounds);
     }
     const mean = bounds ? meanLuminance(this.lum, alpha, w, bounds) : 0.5;
-    const entry = { selection, alpha, bounds, mean };
+    const entry = { selection, alpha, bounds, extent, mean };
     this.masks.set(regionId, entry);
     return entry;
   }

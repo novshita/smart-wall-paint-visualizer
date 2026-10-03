@@ -24,3 +24,12 @@ export function hexToRgb(hex: string | undefined | null): [number, number, numbe
   const n = parseInt(hex.slice(1), 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
+
+/** Mixes a colour towards black (amount > 0) or white (amount < 0); amount is -1…1. */
+export function shadeHex(hex: string, amount: number): string {
+  const rgb = hexToRgb(hex) ?? [128, 128, 128];
+  const target = amount > 0 ? 0 : 255;
+  const a = Math.min(1, Math.abs(amount));
+  const out = rgb.map((c) => Math.round(c + (target - c) * a));
+  return `#${out.map((c) => c.toString(16).padStart(2, '0')).join('')}`.toUpperCase();
+}

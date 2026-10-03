@@ -90,4 +90,24 @@ async function processUpload(buffer, { allowedMimes = ['image/jpeg', 'image/png'
   }
 }
 
-module.exports = { processUpload, detectFormat, MIN_SIDE, WORKING_MAX, THUMB_MAX };
+/** Validates a client-rendered design preview and re-encodes it as a small JPEG. */
+async function processRender(buffer) {
+  if (!detectFormat(buffer)) throw ApiError.badRequest('Render must be a JPG or PNG image.');
+  try {
+    const { data, info } = await sharp(buffer, { limitInputPixels: MAX_PIXELS, failOn: 'error' })
+      .resize({
+        width: THUMB_MAX * 2,
+        height: THUMB_MAX * 2,
+        fit: 'inside',
+        withoutEnlargement: true,
+      })
+      .flatten({ background: '#ffffff' })
+      .jpeg({ quality: 82, mozjpeg: true })
+      .toBuffer({ resolveWithObject: true });
+    return { buffer: data, width: info.width, height: info.height };
+  } catch {
+    throw ApiError.badRequest('Render is not a valid image.');
+  }
+}
+
+module.exports = { processUpload, processRender, detectFormat, MIN_SIDE, WORKING_MAX, THUMB_MAX };

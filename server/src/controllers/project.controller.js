@@ -2,6 +2,7 @@ const { Project } = require('../models');
 const ApiError = require('../utils/api-error');
 const projectService = require('../services/project.service');
 const { logActivity } = require('../services/activity.service');
+const { storage } = require('../services/storage.service');
 
 async function create(req, res) {
   if (!req.file) throw ApiError.badRequest('Choose a photo to upload.');
@@ -55,13 +56,34 @@ async function update(req, res) {
   });
   const { title, status, variants } = req.body;
 
+  let staleRenders = [];
   if (title !== undefined) project.title = title || 'My room';
-  if (variants !== undefined) project.variants = variants;
+  if (variants !== undefined)
+    staleRenders = await projectService.replaceVariants(project, variants);
   if (status !== undefined) project.status = status;
   await project.save();
+  await Promise.all(staleRenders.map((k) => storage.remove(k).catch(() => undefined)));
 
   if (status === 'saved') await logActivity(req.user._id, 'save', { projectId: project._id });
   res.json({ project: projectService.toResponse(project) });
+}
+
+/** POST /projects/:id/render: stores a rendered preview of one variant (owner only). */
+async function render(req, res) {
+  if (!req.file) throw ApiError.badRequest('Attach the rendered image as "image".');
+  const project = await projectService.findAccessible(req.params.id, req.user, {
+    allowAdmin: false,
+  });
+  await projectService.saveRender(project, req.body.variantId, req.file.buffer);
+  res.json({ project: projectService.toResponse(project) });
+}
+
+async function duplicate(req, res) {
+  const project = await projectService.findAccessible(req.params.id, req.user, {
+    allowAdmin: false,
+  });
+  const copy = await projectService.duplicateProject(project);
+  res.status(201).json({ project: projectService.toResponse(copy) });
 }
 
 async function remove(req, res) {
@@ -74,4 +96,4 @@ async function remove(req, res) {
   res.status(204).end();
 }
 
-module.exports = { create, list, getById, update, remove };
+module.exports = { create, list, getById, update, render, duplicate, remove };

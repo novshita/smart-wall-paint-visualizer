@@ -14,6 +14,7 @@ import {
 import { EditorStore } from '../../core/editor/editor.store';
 import { Selection } from '../../core/editor/editor.model';
 import { hasArea } from '../../core/editor/geometry';
+import { toBlob } from '../../core/editor/export';
 import { AnyCanvas, context2d, createCanvas, rasterizeAlpha } from '../../core/editor/mask';
 import { PaintEngine, PaintLayer } from '../../core/editor/paint-engine';
 import { Stage } from '../../core/editor/stage';
@@ -70,6 +71,10 @@ export class StudioCanvas {
   readonly comparePos = model(0.5);
   /** Show the untouched photo (press-and-hold "Before") */
   readonly showBefore = input(false);
+  /** In compare mode, show another design on the left instead of the original photo (FR-C6) */
+  readonly compareLayers = input<PaintLayer[] | null>(null);
+  readonly leftLabel = input('Before');
+  readonly rightLabel = input('After');
 
   readonly view = signal<View>({ scale: 1, x: 0, y: 0 });
   /** How long the last paint composite took, for the < 300 ms target (spec §7) */
@@ -82,6 +87,8 @@ export class StudioCanvas {
   private engine?: PaintEngine;
   private composite?: AnyCanvas;
   private output?: ImageData;
+  private compareComposite?: AnyCanvas;
+  private compareOutput?: ImageData;
   private compositeFrame = 0;
   private readonly hitMasks = new Map<string, { selection: Selection; alpha: Uint8ClampedArray }>();
 
@@ -119,12 +126,15 @@ export class StudioCanvas {
       this.engine = new PaintEngine(ctx.getImageData(0, 0, w, h));
       this.composite = createCanvas(w, h);
       this.output = context2d(this.composite).createImageData(w, h);
+      this.compareComposite = createCanvas(w, h);
+      this.compareOutput = context2d(this.compareComposite).createImageData(w, h);
       this.scheduleComposite();
     });
 
     // Re-composite whenever paint changes (coalesced to one per frame)
     effect(() => {
       this.layers();
+      this.compareLayers();
       this.scheduleComposite();
     });
 
@@ -132,6 +142,8 @@ export class StudioCanvas {
       this.compare();
       this.comparePos();
       this.showBefore();
+      this.leftLabel();
+      this.rightLabel();
       this.stage?.requestRender();
     });
 
@@ -143,6 +155,18 @@ export class StudioCanvas {
 
   protected focusSelf(): void {
     this.host.nativeElement.focus({ preventScroll: true });
+  }
+
+  /** The current painted preview as an image, at most `maxSide` px, e.g. for thumbnails. */
+  async snapshot(maxSide = 960): Promise<Blob | null> {
+    const size = this.imageSize();
+    if (!this.composite || !size) return null;
+    const scale = Math.min(1, maxSide / Math.max(size.width, size.height));
+    const out = createCanvas(Math.round(size.width * scale), Math.round(size.height * scale));
+    const ctx = context2d(out);
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(this.composite as CanvasImageSource, 0, 0, out.width, out.height);
+    return toBlob(out, 'jpg', 0.85);
   }
 
   zoomBy(factor: number): void {
@@ -160,6 +184,11 @@ export class StudioCanvas {
       if (!this.engine || !this.output || !this.composite) return;
       const ms = this.engine.render(this.layers(), this.output);
       context2d(this.composite).putImageData(this.output, 0, 0);
+      const other = this.compareLayers();
+      if (other && this.compareOutput && this.compareComposite) {
+        this.engine.render(other, this.compareOutput);
+        context2d(this.compareComposite).putImageData(this.compareOutput, 0, 0);
+      }
       this.renderMs.set(ms);
       this.stage?.requestRender();
     });
@@ -183,9 +212,10 @@ export class StudioCanvas {
       return;
     }
 
-    // Before on the left of the divider, after on the right
+    // Before (or the other design) on the left of the divider, this design on the right
     const split = this.comparePos() * size.width;
-    ctx.drawImage(img, 0, 0, size.width, size.height);
+    const left = (this.compareLayers() && this.compareComposite) || img;
+    ctx.drawImage(left as CanvasImageSource, 0, 0, size.width, size.height);
     ctx.save();
     ctx.beginPath();
     ctx.rect(split, 0, size.width - split, size.height);
@@ -218,8 +248,8 @@ export class StudioCanvas {
 
     ctx.font = '600 12px Inter, sans-serif';
     ctx.textBaseline = 'top';
-    this.label(ctx, 'Before', sx - 12, top + 12, 'right');
-    this.label(ctx, 'After', sx + 12, top + 12, 'left');
+    this.label(ctx, this.leftLabel(), sx - 12, top + 12, 'right');
+    this.label(ctx, this.rightLabel(), sx + 12, top + 12, 'left');
   }
 
   private label(

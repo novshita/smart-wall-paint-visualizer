@@ -43,6 +43,8 @@ const styleSchema = new Schema(
     colorId: { type: Schema.Types.ObjectId, ref: 'Color' },
     secondaryColorId: { type: Schema.Types.ObjectId, ref: 'Color' },
     customHex: { type: String, match: /^#[0-9a-fA-F]{6}$/ },
+    // Second colour for dual-tone walls / pattern ink when it isn't a library colour
+    secondaryCustomHex: { type: String, match: /^#[0-9a-fA-F]{6}$/ },
     patternId: { type: Schema.Types.ObjectId, ref: 'Pattern' },
     split: {
       direction: { type: String, enum: ['horizontal', 'vertical'] },
@@ -72,7 +74,8 @@ const variantSchema = new Schema(
     variantId: { type: String, required: true },
     name: { type: String, trim: true, maxlength: 100 },
     regions: { type: [regionSchema], default: [] },
-    renderUrl: String,
+    // Small rendered preview of this design (storage key; served as a signed renderUrl)
+    renderKey: String,
   },
   { _id: false },
 );

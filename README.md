@@ -249,8 +249,8 @@ npx ng lint
 - [x] Image upload (validation, metadata stripping, private signed links, dashboard recent designs)
 - [x] Manual wall selection (polygon, brush, eraser, multiple walls, undo/redo, zoom/pan, soft edges)
 - [x] Solid colour application with realistic blending, finishes, before/after, auto-save
-- [ ] Dual-tone walls, patterns, and design variants
-- [ ] Save, reopen, and download designs
+- [x] Dual-tone walls, patterns, and design variants (with side-by-side variant comparison)
+- [x] Save, reopen, and download designs (full-resolution PNG/JPG, before/after export, Saved Designs page)
 - [ ] Admin panel and KPI dashboard
 - [ ] Cloud deployment
 

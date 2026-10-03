@@ -1,0 +1,111 @@
+<section class="page">
+  <header class="head">
+    <div>
+      <h1>My designs</h1>
+      <p class="muted">Reopen a design to keep editing, or download it to share.</p>
+    </div>
+    <a mat-flat-button routerLink="/projects/new">
+      <mat-icon>add_photo_alternate</mat-icon>
+      New design
+    </a>
+  </header>
+
+  <mat-button-toggle-group
+    hideSingleSelectionIndicator
+    class="filters"
+    aria-label="Filter designs"
+    [value]="filter()"
+    (change)="setFilter($event.value)"
+  >
+    <mat-button-toggle value="all">All</mat-button-toggle>
+    <mat-button-toggle value="draft">Drafts</mat-button-toggle>
+    <mat-button-toggle value="saved">Saved</mat-button-toggle>
+  </mat-button-toggle-group>
+
+  @if (list.isLoading()) {
+    <mat-progress-bar mode="indeterminate" aria-label="Loading designs" />
+  }
+
+  @if (list.error() && !list.isLoading()) {
+    <div class="state" role="alert">
+      <mat-icon aria-hidden="true">cloud_off</mat-icon>
+      <p>We couldn't load your designs.</p>
+      <button mat-stroked-button type="button" (click)="list.reload()">Retry</button>
+    </div>
+  } @else if (list.hasValue()) {
+    @let result = list.value();
+    @if (result.items.length) {
+      <ul class="grid">
+        @for (p of result.items; track p._id) {
+          <li class="card">
+            <a class="thumb" [routerLink]="openLink(p)" [attr.aria-label]="'Open ' + p.title">
+              <img [src]="thumbnail(p)" alt="" loading="lazy" />
+              <span class="status {{ p.status }}">{{
+                p.status === 'saved' ? 'Saved' : 'Draft'
+              }}</span>
+            </a>
+            <div class="info">
+              <div class="text">
+                <a class="title" [routerLink]="openLink(p)">{{ p.title }}</a>
+                <span class="muted meta">
+                  Edited {{ p.updatedAt | date: 'mediumDate' }}
+                  @if (p.variants.length > 1) {
+                    · {{ p.variants.length }} designs
+                  }
+                </span>
+              </div>
+              <button
+                mat-icon-button
+                type="button"
+                [matMenuTriggerFor]="menu"
+                [attr.aria-label]="'Actions for ' + p.title"
+              >
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu" xPosition="before">
+                <a mat-menu-item [routerLink]="openLink(p)"
+                  ><mat-icon>edit</mat-icon><span>Open</span></a
+                >
+                <button mat-menu-item (click)="download(p)">
+                  <mat-icon>download</mat-icon><span>Download</span>
+                </button>
+                <button mat-menu-item (click)="rename(p)">
+                  <mat-icon>drive_file_rename_outline</mat-icon><span>Rename</span>
+                </button>
+                <button mat-menu-item (click)="duplicate(p)">
+                  <mat-icon>content_copy</mat-icon><span>Duplicate</span>
+                </button>
+                <button mat-menu-item class="danger" (click)="remove(p)">
+                  <mat-icon>delete</mat-icon><span>Delete</span>
+                </button>
+              </mat-menu>
+            </div>
+          </li>
+        }
+      </ul>
+      @if (result.pages > 1) {
+        <mat-paginator
+          [length]="result.total"
+          [pageSize]="pageSize"
+          [pageIndex]="result.page - 1"
+          [hidePageSize]="true"
+          (page)="onPage($event)"
+          aria-label="Choose page of designs"
+        />
+      }
+    } @else {
+      <div class="state">
+        <mat-icon aria-hidden="true">photo_library</mat-icon>
+        @if (filter() === 'all') {
+          <p>You haven't created any designs yet.</p>
+          <a mat-flat-button routerLink="/projects/new">Upload a room photo</a>
+        } @else {
+          <p>No {{ filter() === 'saved' ? 'saved designs' : 'drafts' }} yet.</p>
+          <button mat-stroked-button type="button" (click)="setFilter('all')">
+            Show all designs
+          </button>
+        }
+      </div>
+    }
+  }
+</section>

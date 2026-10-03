@@ -25,13 +25,18 @@
   </div>
 
   <section class="section" aria-labelledby="recent-heading">
-    <h2 id="recent-heading">Recent designs</h2>
+    <div class="section-head">
+      <h2 id="recent-heading">Recent designs</h2>
+      @if (recent.hasValue() && recent.value().total > recent.value().items.length) {
+        <a mat-button routerLink="/projects">See all {{ recent.value().total }}</a>
+      }
+    </div>
     @if (recent.hasValue() && recent.value().items.length) {
       <ul class="projects">
         @for (p of recent.value().items; track p._id) {
           <li>
-            <a class="project" [routerLink]="['/projects', p._id, 'select']">
-              <img [src]="p.thumbnailUrl" alt="" loading="lazy" />
+            <a class="project" [routerLink]="openLink(p)">
+              <img [src]="thumbnail(p)" alt="" loading="lazy" />
               <span class="project-info">
                 <span class="project-title">{{ p.title }}</span>
                 <span class="muted small">Edited {{ p.updatedAt | date: 'mediumDate' }}</span>
