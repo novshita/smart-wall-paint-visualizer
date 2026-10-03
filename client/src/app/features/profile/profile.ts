@@ -1,4 +1,5 @@
 import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import {
   FormGroupDirective,
@@ -12,6 +13,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../core/auth/auth.service';
+import { FavoritesService } from '../../core/catalog/favorites.service';
+import { SwatchCard } from '../../shared/components/swatch-card/swatch-card';
 import { ApiError } from '../../shared/models/api-error.model';
 import {
   PASSWORD_PATTERN,
@@ -19,11 +22,13 @@ import {
   matchValidator,
 } from '../../shared/forms/form-errors';
 
-/** Account details and password (FR-A5). Favourites are added with the colour library. */
+/** Account details, password (FR-A5), and favourite colours (FR-L5). */
 @Component({
   selector: 'app-profile',
   imports: [
     DatePipe,
+    RouterLink,
+    SwatchCard,
     ReactiveFormsModule,
     MatButtonModule,
     MatFormFieldModule,
@@ -37,6 +42,7 @@ import {
 })
 export class Profile {
   protected readonly auth = inject(AuthService);
+  protected readonly favorites = inject(FavoritesService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly fb = inject(NonNullableFormBuilder);
 

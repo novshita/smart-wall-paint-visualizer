@@ -1,0 +1,125 @@
+<section class="page">
+  <a mat-button routerLink="/colors" class="back">
+    <mat-icon>arrow_back</mat-icon>
+    Colour library
+  </a>
+
+  @if (color(); as c) {
+    <div class="detail">
+      <div class="preview" [style.background]="c.hex" [style.color]="textColor()">
+        <span class="preview-label">{{ c.name }}</span>
+      </div>
+
+      <div class="info">
+        <p class="family muted">{{ c.family }} family</p>
+        <h1>{{ c.name }}</h1>
+        <p class="code">{{ c.code }} · {{ c.brand }}</p>
+
+        <dl class="values">
+          <div>
+            <dt>HEX</dt>
+            <dd>
+              <code>{{ c.hex }}</code>
+              <button
+                mat-icon-button
+                type="button"
+                (click)="copy(c.hex, 'HEX')"
+                aria-label="Copy HEX value"
+                matTooltip="Copy"
+              >
+                <mat-icon>content_copy</mat-icon>
+              </button>
+            </dd>
+          </div>
+          <div>
+            <dt>RGB</dt>
+            <dd>
+              <code>{{ rgb() }}</code>
+              <button
+                mat-icon-button
+                type="button"
+                (click)="copy(rgb(), 'RGB')"
+                aria-label="Copy RGB value"
+                matTooltip="Copy"
+              >
+                <mat-icon>content_copy</mat-icon>
+              </button>
+            </dd>
+          </div>
+        </dl>
+
+        <h2 class="subhead">Available finishes</h2>
+        <ul class="finishes">
+          @for (finish of c.finishes; track finish) {
+            <li>
+              <span class="finish-swatch {{ finish }}" [style.background-color]="c.hex"></span>
+              {{ finish | titlecase }}
+            </li>
+          }
+        </ul>
+
+        @if (c.tags.length) {
+          <h2 class="subhead">Great for</h2>
+          <ul class="tags">
+            @for (tag of c.tags; track tag) {
+              <li>
+                <a [routerLink]="['/colors']" [queryParams]="{ tag }">{{ tag }}</a>
+              </li>
+            }
+          </ul>
+        }
+
+        <div class="actions">
+          <button
+            mat-flat-button
+            type="button"
+            disabled
+            matTooltip="Room upload is coming in the next update"
+          >
+            <mat-icon>add_photo_alternate</mat-icon>
+            Try on my room
+          </button>
+          <button
+            mat-stroked-button
+            type="button"
+            (click)="favorites.toggle(c)"
+            [attr.aria-pressed]="favorites.isFavorite(c._id)"
+          >
+            <mat-icon [class.filled]="favorites.isFavorite(c._id)">favorite</mat-icon>
+            {{ favorites.isFavorite(c._id) ? 'Saved to favourites' : 'Add to favourites' }}
+          </button>
+        </div>
+
+        <app-disclaimer [compact]="true" />
+      </div>
+    </div>
+
+    @if (related().length) {
+      <section class="related" aria-labelledby="related-heading">
+        <h2 id="related-heading">More from the {{ c.family }} family</h2>
+        <ul class="grid">
+          @for (r of related(); track r._id) {
+            <li><app-swatch-card [color]="r" [compact]="true" /></li>
+          }
+        </ul>
+      </section>
+    }
+  } @else if (notFound()) {
+    <div class="state">
+      <mat-icon aria-hidden="true">search_off</mat-icon>
+      <h1>Colour not found</h1>
+      <p class="muted">This colour may have been removed from the library.</p>
+      <a mat-flat-button routerLink="/colors">Browse all colours</a>
+    </div>
+  } @else if (resource.error()) {
+    <div class="state" role="alert">
+      <mat-icon aria-hidden="true">cloud_off</mat-icon>
+      <p>We couldn't load this colour. Please try again.</p>
+      <button mat-stroked-button type="button" (click)="resource.reload()">Retry</button>
+    </div>
+  } @else {
+    <div class="state" aria-label="Loading colour">
+      <mat-spinner diameter="40" />
+    </div>
+  }
+</section>

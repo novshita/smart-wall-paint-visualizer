@@ -20,7 +20,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(
       routes,
       withComponentInputBinding(),
-      withInMemoryScrolling({ scrollPositionRestoration: 'top' }),
+      withInMemoryScrolling({ scrollPositionRestoration: 'top', anchorScrolling: 'enabled' }),
     ),
     // Order matters: auth wraps error, so it sees normalised ApiError objects
     provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),

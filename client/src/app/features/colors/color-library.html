@@ -1,0 +1,157 @@
+<section class="page">
+  <header class="head">
+    <div>
+      <h1>Colour library</h1>
+      <p class="muted">Browse by family, search by name, code or HEX, and save your favourites.</p>
+    </div>
+  </header>
+
+  <div class="filters" role="search">
+    <mat-form-field appearance="outline" class="search" subscriptSizing="dynamic">
+      <mat-icon matPrefix aria-hidden="true">search</mat-icon>
+      <mat-label>Search colours</mat-label>
+      <input
+        matInput
+        type="search"
+        placeholder="e.g. Sage, GN-501, #A7B49A"
+        [value]="searchText()"
+        (input)="onSearch($any($event.target).value)"
+        autocomplete="off"
+      />
+      @if (searchText()) {
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          aria-label="Clear search"
+          (click)="clearSearch()"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+
+    @if (facets.hasValue()) {
+      @let f = facets.value();
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Room</mat-label>
+        <mat-select [value]="tag() ?? ''" (selectionChange)="setFilter('tag', $event.value)">
+          <mat-option value="">Any room</mat-option>
+          @for (t of f.tags; track t.value) {
+            <mat-option [value]="t.value">{{ t.value }} ({{ t.count }})</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Finish</mat-label>
+        <mat-select [value]="finish() ?? ''" (selectionChange)="setFilter('finish', $event.value)">
+          <mat-option value="">Any finish</mat-option>
+          @for (fin of f.finishes; track fin.value) {
+            <mat-option [value]="fin.value">{{ fin.value | titlecase }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      @if (f.brands.length > 1) {
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>Brand</mat-label>
+          <mat-select [value]="brand() ?? ''" (selectionChange)="setFilter('brand', $event.value)">
+            <mat-option value="">Any brand</mat-option>
+            @for (b of f.brands; track b.value) {
+              <mat-option [value]="b.value">{{ b.value }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      }
+    }
+  </div>
+
+  @if (facets.hasValue()) {
+    <div class="families" role="group" aria-label="Colour family">
+      <button
+        type="button"
+        class="family"
+        [class.active]="!family()"
+        [attr.aria-pressed]="!family()"
+        (click)="setFilter('family', null)"
+      >
+        <span class="dot all" aria-hidden="true"></span>
+        All
+      </button>
+      @for (fam of facets.value().families; track fam.value) {
+        <button
+          type="button"
+          class="family"
+          [class.active]="family() === fam.value"
+          [attr.aria-pressed]="family() === fam.value"
+          (click)="toggleFamily(fam.value)"
+        >
+          <span class="dot" [style.background]="fam.sampleHex" aria-hidden="true"></span>
+          {{ fam.value }}
+        </button>
+      }
+    </div>
+  }
+
+  <div class="status-row">
+    <p class="count muted" aria-live="polite">
+      @if (results(); as r) {
+        {{ r.total }} {{ r.total === 1 ? 'colour' : 'colours' }}
+        @if (hasFilters()) {
+          match your filters
+        }
+      }
+    </p>
+    @if (hasFilters()) {
+      <button mat-button type="button" (click)="clearAll()">
+        <mat-icon>filter_alt_off</mat-icon>
+        Clear filters
+      </button>
+    }
+  </div>
+
+  @if (colors.isLoading()) {
+    <mat-progress-bar mode="indeterminate" aria-label="Loading colours" />
+  }
+
+  @if (colors.error() && !colors.isLoading()) {
+    <div class="state error" role="alert">
+      <mat-icon aria-hidden="true">cloud_off</mat-icon>
+      <p>We couldn't load the colours. Please try again.</p>
+      <button mat-stroked-button type="button" (click)="colors.reload()">Retry</button>
+    </div>
+  } @else if (results(); as r) {
+    @if (r.items.length) {
+      <ul class="grid" [class.dim]="colors.isLoading()">
+        @for (color of r.items; track color._id) {
+          <li><app-swatch-card [color]="color" /></li>
+        }
+      </ul>
+
+      @if (r.pages > 1) {
+        <mat-paginator
+          [length]="r.total"
+          [pageSize]="pageSize"
+          [pageIndex]="r.page - 1"
+          [hidePageSize]="true"
+          [showFirstLastButtons]="true"
+          (page)="onPage($event)"
+          aria-label="Choose page of colours"
+        />
+      }
+    } @else {
+      <div class="state">
+        <mat-icon aria-hidden="true">format_color_reset</mat-icon>
+        <p>No colours match your search.</p>
+        <button mat-stroked-button type="button" (click)="clearAll()">Clear filters</button>
+      </div>
+    }
+  } @else if (colors.isLoading()) {
+    <ul class="grid skeleton" aria-hidden="true">
+      @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+        <li><span class="ghost"></span></li>
+      }
+    </ul>
+  }
+</section>

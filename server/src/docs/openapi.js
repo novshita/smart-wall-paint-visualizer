@@ -3,6 +3,7 @@
  * Each feature adds a module under ./paths with its schemas and paths.
  */
 const auth = require('./paths/auth');
+const catalog = require('./paths/catalog');
 
 module.exports = {
   openapi: '3.0.3',
@@ -19,6 +20,7 @@ module.exports = {
     },
     schemas: {
       ...auth.schemas,
+      ...catalog.schemas,
       Error: {
         type: 'object',
         properties: {
@@ -37,6 +39,7 @@ module.exports = {
   },
   paths: {
     ...auth.paths,
+    ...catalog.paths,
     '/health': {
       get: {
         tags: ['System'],
